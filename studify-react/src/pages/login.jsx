@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Card from 'react-bootstrap/Card'
 import Form from 'react-bootstrap/Form'
+import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/Button'
 import usePageTitle from '../hooks/usePageTitle'
 
@@ -21,10 +26,15 @@ function validate({ email, password }) {
   return errors
 }
 
-function Brand({ className = '' }) {
+function Brand({ className = '', markClassName = 'bg-primary text-white' }) {
   return (
-    <Link to="/" className={`login-brand ${className}`}>
-      <span className="login-brand-mark"><i className="bi bi-book-half"></i></span>
+    <Link to="/" className={`d-inline-flex align-items-center gap-2 fw-bold fs-4 text-reset ${className}`}>
+      <span
+        className={`d-flex align-items-center justify-content-center rounded-3 ${markClassName}`}
+        style={{ width: 40, height: 40 }}
+      >
+        <i className="bi bi-book-half fs-5"></i>
+      </span>
       Studify
     </Link>
   )
@@ -47,83 +57,90 @@ export default function Login() {
     e.preventDefault()
     const found = validate(values)
     setErrors(found)
-    if (Object.keys(found).length === 0) navigate('/')
+    if (Object.keys(found).length === 0) navigate('/inicio')
   }
 
   return (
-    <div className="login-page">
-      <aside className="login-aside">
-        <Brand />
-        <div>
-          <h2>Tu espacio para enfocarte.</h2>
-          <p>Organizá tus materias, apuntes y exámenes en un solo lugar.</p>
-          <ul className="list-unstyled d-grid gap-3 mb-0">
-            {highlights.map(({ icon, text }) => (
-              <li key={text} className="login-highlight">
-                <span><i className={`bi ${icon}`}></i></span>
-                {text}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+    <Container fluid className="p-0">
+      <Row className="g-0 min-vh-100">
+        <Col lg={5} className="login-aside d-none d-lg-flex flex-column justify-content-between p-5 text-white">
+          <Brand markClassName="bg-white bg-opacity-10 text-white" />
+          <div>
+            <h2 className="display-6 fw-bold mb-2">Tu espacio para enfocarte.</h2>
+            <p className="text-white-50 mb-4">Organizá tus materias, apuntes y exámenes en un solo lugar.</p>
+            <ul className="list-unstyled d-grid gap-3 mb-0">
+              {highlights.map(({ icon, text }) => (
+                <li key={text} className="d-flex align-items-center gap-3">
+                  <span
+                    className="d-flex align-items-center justify-content-center flex-shrink-0 rounded-3 bg-white bg-opacity-10 text-warning"
+                    style={{ width: 36, height: 36 }}
+                  >
+                    <i className={`bi ${icon}`}></i>
+                  </span>
+                  {text}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Col>
 
-      <main className="login-main">
-        <Brand className="login-brand--mobile" />
-        <section className="login-card" aria-labelledby="login-title">
-          <h1 id="login-title">Ingresá a Studify</h1>
-          <p className="text-secondary mb-4">Retomá tus materias, apuntes y tareas donde los dejaste.</p>
+        <Col xs={12} lg={7} as="main" className="d-flex flex-column align-items-center justify-content-center gap-4 p-4">
+          <Brand className="d-lg-none" />
+          <Card className="w-100 border-0 shadow-sm" style={{ maxWidth: 440 }}>
+            <Card.Body className="p-4 p-md-5">
+              <h1 className="h3 fw-bold mb-1">Ingresá a Studify</h1>
+              <p className="text-secondary mb-4">Retomá tus materias, apuntes y tareas donde los dejaste.</p>
 
-          <Form noValidate onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="login-email">
-              <Form.Label>Correo electrónico</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                placeholder="nombre@mail.com"
-                autoComplete="email"
-                value={values.email}
-                onChange={handleChange}
-                isInvalid={!!errors.email}
-                aria-describedby="login-email-error"
-              />
-              {errors.email && <div id="login-email-error" className="invalid-feedback d-block">{errors.email}</div>}
-            </Form.Group>
+              <Form noValidate onSubmit={handleSubmit}>
+                <Form.Group className="mb-3" controlId="login-email">
+                  <Form.Label className="fw-semibold">Correo electrónico</Form.Label>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    placeholder="nombre@mail.com"
+                    autoComplete="email"
+                    value={values.email}
+                    onChange={handleChange}
+                    isInvalid={!!errors.email}
+                  />
+                  <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group className="mb-4" controlId="login-password">
-              <Form.Label>Contraseña</Form.Label>
-              <div className="login-password">
-                <Form.Control
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  placeholder="Mínimo 6 caracteres"
-                  autoComplete="current-password"
-                  value={values.password}
-                  onChange={handleChange}
-                  isInvalid={!!errors.password}
-                  aria-describedby="login-password-error"
-                />
-                <button
-                  type="button"
-                  className="login-toggle"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                  aria-pressed={showPassword}
-                >
-                  <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
-                </button>
-              </div>
-              {errors.password && <div id="login-password-error" className="invalid-feedback d-block">{errors.password}</div>}
-            </Form.Group>
+                <Form.Group className="mb-4" controlId="login-password">
+                  <Form.Label className="fw-semibold">Contraseña</Form.Label>
+                  <InputGroup hasValidation>
+                    <Form.Control
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      placeholder="Mínimo 6 caracteres"
+                      autoComplete="current-password"
+                      value={values.password}
+                      onChange={handleChange}
+                      isInvalid={!!errors.password}
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      aria-pressed={showPassword}
+                    >
+                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </Button>
+                    <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
 
-            <Button type="submit" variant="primary" size="lg" className="w-100">Iniciar sesión</Button>
-          </Form>
+                <Button type="submit" variant="primary" size="lg" className="w-100">Iniciar sesión</Button>
+              </Form>
 
-          <p className="login-alt mb-0 text-secondary">
-            ¿Querés ver la app antes? <Link to="/">Explorar sin iniciar sesión</Link>
-          </p>
-        </section>
-      </main>
-    </div>
+              <hr className="my-4" />
+              <p className="text-secondary text-center small mb-0">
+                ¿Querés ver la app antes? <Link to="/inicio" className="fw-semibold">Explorar sin iniciar sesión</Link>
+              </p>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   )
 }
