@@ -1,12 +1,14 @@
-export default function TechniqueCard({ icon, title, description, duration }) {
+import ToneIcon from './ToneIcon'
+
+export default function TechniqueCard({ icon, title, description, duration, tone = 'success' }) {
   return (
-    <article className="technique-card">
-      <div className="technique-icon">
-        <i className={`bi ${icon}`}></i>
+    <div className="card h-100">
+      <div className="card-body">
+        <ToneIcon icon={`${icon} fs-5`} tone={tone} />
+        <h3 className="h6 fw-bold mt-3 mb-1">{title}</h3>
+        <p className="text-secondary small mb-3">{description}</p>
+        <span className="badge bg-warning-subtle text-warning"><i className="bi bi-stopwatch me-1"></i>{duration}</span>
       </div>
-      <h3 className="h6 mt-3">{title}</h3>
-      <p className="small text-secondary">{description}</p>
-      {duration && <span className="badge rounded-pill text-bg-light">{duration}</span>}
-    </article>
+    </div>
   )
 }
