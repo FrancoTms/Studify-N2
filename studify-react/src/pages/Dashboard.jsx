@@ -6,6 +6,7 @@ import ExamCard from '../components/ExamCard'
 import TaskItem from '../components/TaskItem'
 import TechniqueCard from '../components/TechniqueCard'
 import ProgressBar from '../components/ProgressBar'
+import usePageTitle from '../hooks/usePageTitle'
 
 const stats = [
   { icon: 'bi-clock-history', title: 'Horas estudiadas', value: '12h 30m', description: 'Esta semana', tone: 'primary' },
@@ -45,135 +46,125 @@ const techniques = [
 ]
 
 export default function Dashboard() {
+  usePageTitle('Inicio | Studify')
+
   return (
-    <main className="col-lg-9 col-xl-10 px-3 px-lg-4 py-4" id="inicio">
-      <div className="container-fluid">
-        <header className="mb-4">
-          <p className="text-primary fw-semibold mb-1">Tu espacio de estudio</p>
-          <h1 className="display-6 fw-bold mb-1">Hola, estudiante 👋</h1>
-          <p className="text-secondary mb-0">Organizá tu tiempo, mantené el foco y seguí tu progreso.</p>
-        </header>
+    <>
+      <header className="dash-hero rounded-4 p-4 p-lg-5 mb-4 text-white">
+        <p className="text-white-50 fw-semibold mb-1">Tu espacio de estudio</p>
+        <h1 className="display-6 fw-bold mb-1">Hola, estudiante</h1>
+        <p className="text-white-50 mb-0">Organizá tu tiempo, mantené el foco y seguí tu progreso.</p>
+      </header>
 
-        <section className="mb-5">
-          <SectionHeader title="Resumen" subtitle="Una vista rápida de tu actividad." />
-          <div className="row g-3">
-            {stats.map((stat) => (
-              <div className="col-sm-6 col-xl-3" key={stat.title}>
-                <StatCard {...stat} />
-              </div>
-            ))}
-          </div>
-        </section>
+      <section className="mb-4">
+        <SectionHeader title="Resumen" subtitle="Una vista rápida de tu actividad." />
+        <div className="row g-3" aria-label="Resumen de actividad">
+          {stats.map((stat) => (
+            <div className="col-sm-6 col-xl-3" key={stat.title}>
+              <StatCard {...stat} />
+            </div>
+          ))}
+        </div>
+      </section>
 
-        <section className="mb-5" id="plan-de-hoy">
-          <SectionHeader title="Plan de hoy" subtitle="Tus tareas prioritarias para esta jornada." />
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <div className="d-flex flex-column gap-2">
-                {tasks.map((task) => <TaskItem key={task.title} {...task} />)}
-              </div>
+      <section className="dash-panel" id="plan-de-hoy" style={{ '--panel-accent': 'var(--sf-primary)' }}>
+        <SectionHeader title="Plan de hoy" subtitle="Tus tareas prioritarias para esta jornada." />
+        <div>
+            <div className="d-flex flex-column gap-2">
+              {tasks.map((task) => <TaskItem key={task.title} {...task} />)}
             </div>
           </div>
         </section>
 
-        <section className="mb-5" id="materias">
-          <SectionHeader title="Mis materias" subtitle="Consultá el progreso de cada materia." actionLabel="Ver todas" />
-          <div className="row g-3">
-            {subjects.map((subject) => (
-              <div className="col-md-6 col-xl-4" key={subject.name}>
-                <SubjectCard {...subject} />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-5" id="mis-apuntes">
-          <SectionHeader title="Mis apuntes" subtitle="Tus materiales recientes." actionLabel="Ver apuntes" />
-          <div className="row g-3">
-            {notes.map((note) => (
-              <div className="col-md-6 col-xl-4" key={note.title}>
-                <NoteCard {...note} />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-5" id="proximos-examenes">
-          <SectionHeader title="Próximos exámenes" subtitle="No pierdas de vista tus fechas importantes." />
-          <div className="row g-3">
-            {exams.map((exam) => (
-              <div className="col-md-6 col-xl-4" key={exam.title}>
-                <ExamCard {...exam} />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-5" id="mi-progreso">
-          <SectionHeader title="Mi progreso" subtitle="Seguimiento de tus objetivos de estudio." />
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <ProgressBar label="Objetivo semanal" value={72} detail="8h 40m de 12h completadas" />
-              <ProgressBar label="Materias al día" value={64} detail="3 de 5 materias con actividad reciente" />
+      <section className="dash-panel" id="materias" style={{ '--panel-accent': 'var(--sf-blue)' }}>
+        <SectionHeader title="Mis materias" subtitle="Consultá el progreso de cada materia." actionLabel="Ver todas" />
+        <div className="row g-3">
+          {subjects.map((subject) => (
+            <div className="col-md-6 col-xl-4" key={subject.name}>
+              <SubjectCard {...subject} />
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="dash-panel" id="mis-apuntes" style={{ '--panel-accent': 'var(--sf-yellow)' }}>
+        <SectionHeader title="Mis apuntes" subtitle="Tus materiales recientes." actionLabel="Ver apuntes" />
+        <div className="row g-3">
+          {notes.map((note) => (
+            <div className="col-md-6 col-xl-4" key={note.title}>
+              <NoteCard {...note} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="dash-panel" id="proximos-examenes" style={{ '--panel-accent': 'var(--sf-accent)' }}>
+        <SectionHeader title="Próximos exámenes" subtitle="No pierdas de vista tus fechas importantes." />
+        <div className="row g-3">
+          {exams.map((exam) => (
+            <div className="col-md-6 col-xl-4" key={exam.title}>
+              <ExamCard {...exam} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="dash-panel" id="mi-progreso" style={{ '--panel-accent': 'var(--sf-primary)' }}>
+        <SectionHeader title="Mi progreso" subtitle="Seguimiento de tus objetivos de estudio." />
+        <div>
+            <ProgressBar label="Objetivo semanal" value={72} detail="8h 40m de 12h completadas" />
+            <ProgressBar label="Materias al día" value={64} detail="3 de 5 materias con actividad reciente" />
           </div>
         </section>
 
-        <section className="mb-5" id="tecnicas-estudio">
-          <SectionHeader title="Técnicas de estudio" subtitle="Elegí una estrategia para tu próxima sesión." />
-          <div className="row g-3">
-            {techniques.map((technique) => (
-              <div className="col-md-6 col-xl-4" key={technique.title}>
-                <TechniqueCard {...technique} />
+      <section className="dash-panel" id="tecnicas-estudio" style={{ '--panel-accent': 'var(--sf-yellow)' }}>
+        <SectionHeader title="Técnicas de estudio" subtitle="Elegí una estrategia para tu próxima sesión." />
+        <div className="row g-3">
+          {techniques.map((technique) => (
+            <div className="col-md-6 col-xl-4" key={technique.title}>
+              <TechniqueCard {...technique} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="dash-panel" id="pomodoro" style={{ '--panel-accent': 'var(--sf-accent)' }}>
+        <SectionHeader title="Pomodoro" subtitle="Una sesión rápida para empezar a estudiar." />
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+              <span className="badge text-bg-primary mb-2">Enfoque</span>
+              <h3 className="h4 mb-1">25:00</h3>
+              <p className="text-secondary mb-0">Preparado para comenzar una sesión.</p>
+            </div>
+            <button className="btn btn-primary js-pomodoro-start">
+              <i className="bi bi-play-fill me-1"></i> Iniciar
+            </button>
+          </div>
+        </section>
+
+      <section className="dash-panel" id="estadisticas" style={{ '--panel-accent': 'var(--sf-blue)' }}>
+        <SectionHeader title="Estadísticas" subtitle="Visualizá tus hábitos y horas de estudio." />
+        <div>
+            <ProgressBar label="Constancia semanal" value={78} detail="5 días activos esta semana" />
+            <ProgressBar label="Cumplimiento de tareas" value={83} detail="10 de 12 tareas completadas" />
+          </div>
+        </section>
+
+      <section className="dash-panel" id="ia-asistente" style={{ '--panel-accent': 'var(--sf-primary)' }}>
+        <SectionHeader title="IA Asistente" subtitle="Herramientas para resumir, practicar y organizar tus materiales." />
+        <div>
+            <div className="d-flex align-items-start gap-3">
+              <div className="rounded-3 bg-primary-subtle text-primary p-3">
+                <i className="bi bi-robot fs-3"></i>
               </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-5" id="pomodoro">
-          <SectionHeader title="Pomodoro" subtitle="Una sesión rápida para empezar a estudiar." />
-          <div className="card border-0 shadow-sm">
-            <div className="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
               <div>
-                <span className="badge text-bg-primary mb-2">Enfoque</span>
-                <h3 className="h4 mb-1">25:00</h3>
-                <p className="text-secondary mb-0">Preparado para comenzar una sesión.</p>
-              </div>
-              <button className="btn btn-primary js-pomodoro-start">
-                <i className="bi bi-play-fill me-1"></i> Iniciar
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-5" id="estadisticas">
-          <SectionHeader title="Estadísticas" subtitle="Visualizá tus hábitos y horas de estudio." />
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <ProgressBar label="Constancia semanal" value={78} detail="5 días activos esta semana" />
-              <ProgressBar label="Cumplimiento de tareas" value={83} detail="10 de 12 tareas completadas" />
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-5" id="ia-asistente">
-          <SectionHeader title="IA Asistente" subtitle="Herramientas para resumir, practicar y organizar tus materiales." />
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <div className="d-flex align-items-start gap-3">
-                <div className="rounded-3 bg-primary-subtle text-primary p-3">
-                  <i className="bi bi-robot fs-3"></i>
-                </div>
-                <div>
-                  <h3 className="h5">Asistente de estudio</h3>
-                  <p className="text-secondary mb-3">Cargá un documento para generar resúmenes o preguntas de práctica.</p>
-                  <button className="btn btn-outline-primary">Abrir asistente</button>
-                </div>
+                <h3 className="h5">Asistente de estudio</h3>
+                <p className="text-secondary mb-3">Cargá un documento para generar resúmenes o preguntas de práctica.</p>
+                <button className="btn btn-outline-primary">Abrir asistente</button>
               </div>
             </div>
           </div>
         </section>
-      </div>
-    </main>
+    </>
   )
 }
