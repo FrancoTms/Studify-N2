@@ -1,15 +1,11 @@
-export default function SectionHeader({ title, subtitle, actionLabel, actionHref = '#' }) {
+export default function SectionHeader({ title, subtitle, actionLabel }) {
   return (
-    <div className="d-flex justify-content-between align-items-end gap-3 mb-3">
+    <div className="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
       <div>
-        <h2 className="h4 mb-1">{title}</h2>
+        <h2 className="h4 fw-bold mb-0">{title}</h2>
         {subtitle && <p className="text-secondary mb-0">{subtitle}</p>}
       </div>
-      {actionLabel && (
-        <a href={actionHref} className="btn btn-sm btn-outline-primary">
-          {actionLabel}
-        </a>
-      )}
+      {actionLabel && <button type="button" className="btn btn-outline-primary btn-sm">{actionLabel}</button>}
     </div>
   )
 }
