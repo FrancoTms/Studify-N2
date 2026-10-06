@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
-
+import usePageTitle from '../hooks/usePageTitle'
 
 const highlights = [
   { icon: 'bi-check2-square', text: 'Plan de hoy con tus tareas prioritarias' },
