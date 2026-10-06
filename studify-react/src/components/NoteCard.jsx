@@ -1,19 +1,16 @@
-export default function NoteCard({ title, subject, date, icon = 'bi-journal-text' }) {
+import ToneIcon from './ToneIcon'
+
+export default function NoteCard({ title, subject, date }) {
   return (
-    <article className="note-card">
-      <div className="d-flex align-items-start gap-3">
-        <div className="note-icon">
-          <i className={`bi ${icon}`}></i>
+    <div className="card h-100">
+      <div className="card-body d-flex gap-3">
+        <ToneIcon icon="bi-journal-text fs-5" tone="danger" />
+        <div>
+          <h3 className="h6 fw-bold mb-1">{title}</h3>
+          <span className="badge bg-primary-subtle text-primary mb-2">{subject}</span>
+          <p className="text-secondary small mb-0">{date}</p>
         </div>
-        <div className="flex-grow-1">
-          <h3 className="h6 mb-1">{title}</h3>
-          <p className="small text-secondary mb-1">{subject}</p>
-          {date && <small className="text-secondary">{date}</small>}
-        </div>
-        <button className="btn btn-sm btn-light" aria-label={`Abrir ${title}`}>
-          <i className="bi bi-arrow-up-right"></i>
-        </button>
       </div>
-    </article>
+    </div>
   )
 }
