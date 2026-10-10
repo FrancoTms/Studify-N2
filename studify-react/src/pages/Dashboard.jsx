@@ -151,13 +151,14 @@ export default function Dashboard() {
         <WeeklyChart data={weeklyHours} />
       </PanelSection>
 
+      <PanelSection id="calendario" tone="info" title="Calendario" subtitle="Tus exámenes, entregas y sesiones de estudio.">
+        <CalendarView />
+      </PanelSection>
+
       <PanelSection id="ia-asistente" tone="primary" title="IA Asistente" subtitle="Preguntale al asistente sobre técnicas, organización y exámenes.">
         <ChatAssistant />
       </PanelSection>
 
-      <PanelSection id="calendario" tone="info" title="Calendario" subtitle="Tus exámenes, entregas y sesiones de estudio.">
-        <CalendarView />
-      </PanelSection>
     </>
   )
 }
