@@ -13,7 +13,10 @@ import ProgressBar from '../components/ProgressBar'
 import PomodoroTimer from '../components/PomodoroTimer'
 import ChatAssistant from '../components/ChatAssistant'
 import WeeklyChart from '../components/WeeklyChart'
+import CalendarView from '../components/CalendarView'
 import usePageTitle from '../hooks/usePageTitle'
+import { events } from '../data/events'
+import { daysFromToday, formatDay } from '../utils/dates'
 
 const stats = [
   { icon: 'bi-clock-history', title: 'Horas estudiadas', value: '12h 30m', description: 'Esta semana', tone: 'primary' },
@@ -34,11 +37,16 @@ const notes = [
   { title: 'Análisis de requerimientos', subject: 'Análisis de Sistemas', date: 'Actualizado hace 3 días' },
 ]
 
-const exams = [
-  { subject: 'Gestión de Desarrollo', title: 'Parcial Unidad 1–4', date: '30 de septiembre', daysLeft: 1, tone: 'primary' },
-  { subject: 'Programación', title: 'Presentación Repositorio N.º 2', date: '2 de octubre', daysLeft: 3, tone: 'success' },
-  { subject: 'Análisis de Sistemas', title: 'Evaluación práctica', date: '8 de octubre', daysLeft: 9, tone: 'warning' },
-]
+// Los exámenes salen de los mismos eventos que muestra el calendario
+const exams = events
+  .filter((e) => e.type === 'exam')
+  .map((e) => ({
+    subject: e.subject,
+    title: e.title,
+    date: formatDay(e.date),
+    daysLeft: daysFromToday(e.date),
+    tone: e.cardTone,
+  }))
 
 const tasks = [
   { title: 'Repasar teoría para el parcial', subject: 'Gestión de Desarrollo', priority: 'Alta' },
@@ -145,6 +153,10 @@ export default function Dashboard() {
 
       <PanelSection id="ia-asistente" tone="primary" title="IA Asistente" subtitle="Preguntale al asistente sobre técnicas, organización y exámenes.">
         <ChatAssistant />
+      </PanelSection>
+
+      <PanelSection id="calendario" tone="info" title="Calendario" subtitle="Tus exámenes, entregas y sesiones de estudio.">
+        <CalendarView />
       </PanelSection>
     </>
   )

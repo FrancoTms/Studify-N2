@@ -40,6 +40,14 @@ h1, h2, h3, h4, h5, h6 { font-family: "Manrope", "DM Sans", sans-serif; }
 }
 .btn-primary:hover { filter: brightness(.9); }
 
+/* En modo oscuro el primario es claro: el texto del botón tiene que ser oscuro */
+[data-bs-theme="dark"] .btn-primary {
+  --bs-btn-color: #071517;
+  --bs-btn-hover-color: #071517;
+  --bs-btn-active-color: #071517;
+  --bs-btn-disabled-color: #071517;
+}
+
 .bg-sidebar { background: #173b37; }
 [data-bs-theme="dark"] .bg-sidebar { background: #071517; }
 .bg-hero { background: linear-gradient(115deg, #0d625c, #176f67 55%, #27857a); }
