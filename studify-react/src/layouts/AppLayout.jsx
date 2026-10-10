@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Sidebar from '../components/Sidebar'
 import AppNavbar from '../components/AppNavbar'
+import TopBar from '../components/TopBar'
 
 export default function AppLayout({ theme, onToggleTheme }) {
   const navigate = useNavigate()
@@ -19,10 +20,11 @@ export default function AppLayout({ theme, onToggleTheme }) {
 
   return (
     <div className="d-flex">
-      <Sidebar theme={theme} onToggleTheme={onToggleTheme} onLogout={askLogout} />
+      <Sidebar />
 
       <div className="flex-grow-1" style={{ minWidth: 0 }}>
         <AppNavbar theme={theme} onToggleTheme={onToggleTheme} onLogout={askLogout} />
+        <TopBar theme={theme} onToggleTheme={onToggleTheme} onLogout={askLogout} />
         <Container as="main" fluid className="px-3 px-lg-5 py-4" style={{ maxWidth: 1180 }}>
           <Outlet />
         </Container>

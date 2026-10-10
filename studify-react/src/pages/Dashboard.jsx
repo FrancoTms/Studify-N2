@@ -67,7 +67,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <header className="bg-hero rounded-4 shadow p-4 p-lg-5 mb-4 text-white">
+      <header id="inicio" className="bg-hero rounded-4 shadow p-4 p-lg-5 mb-4 text-white">
         <p className="text-white-50 fw-semibold mb-1">Tu espacio de estudio</p>
         <h1 className="display-6 fw-bold mb-1">Hola, estudiante</h1>
         <p className="text-white-50 mb-0">Organizá tu tiempo, mantené el foco y seguí tu progreso.</p>
