@@ -1,16 +1,17 @@
+import Card from 'react-bootstrap/Card'
 import ToneIcon from './ToneIcon'
 
 export default function StatCard({ icon, title, value, description, tone = 'primary' }) {
   return (
-    <div className="card h-100">
-      <div className="card-body d-flex align-items-center gap-3">
+    <Card className={`h-100 rounded-4 shadow-sm border-top border-4 border-${tone} hover-lift`}>
+      <Card.Body className="d-flex align-items-center gap-3">
         <ToneIcon icon={`${icon} fs-4`} tone={tone} size={52} />
         <div>
-          <p className="text-secondary small mb-0">{title}</p>
-          <p className="h4 fw-bold mb-0">{value}</p>
-          <p className="text-secondary small mb-0">{description}</p>
+          <Card.Text className="text-secondary small mb-0">{title}</Card.Text>
+          <Card.Text className="h4 fw-bold mb-0">{value}</Card.Text>
+          <Card.Text className="text-secondary small mb-0">{description}</Card.Text>
         </div>
-      </div>
-    </div>
+      </Card.Body>
+    </Card>
   )
 }

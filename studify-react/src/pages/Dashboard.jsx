@@ -1,4 +1,10 @@
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Stack from 'react-bootstrap/Stack'
+import Badge from 'react-bootstrap/Badge'
+import Button from 'react-bootstrap/Button'
 import SectionHeader from '../components/SectionHeader'
+import PanelSection from '../components/PanelSection'
 import StatCard from '../components/StatCard'
 import SubjectCard from '../components/SubjectCard'
 import NoteCard from '../components/NoteCard'
@@ -6,6 +12,7 @@ import ExamCard from '../components/ExamCard'
 import TaskItem from '../components/TaskItem'
 import TechniqueCard from '../components/TechniqueCard'
 import ProgressBar from '../components/ProgressBar'
+import ToneIcon from '../components/ToneIcon'
 import usePageTitle from '../hooks/usePageTitle'
 
 const stats = [
@@ -50,7 +57,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <header className="dash-hero rounded-4 p-4 p-lg-5 mb-4 text-white">
+      <header className="bg-hero rounded-4 shadow p-4 p-lg-5 mb-4 text-white">
         <p className="text-white-50 fw-semibold mb-1">Tu espacio de estudio</p>
         <h1 className="display-6 fw-bold mb-1">Hola, estudiante</h1>
         <p className="text-white-50 mb-0">Organizá tu tiempo, mantené el foco y seguí tu progreso.</p>
@@ -58,113 +65,94 @@ export default function Dashboard() {
 
       <section className="mb-4">
         <SectionHeader title="Resumen" subtitle="Una vista rápida de tu actividad." />
-        <div className="row g-3" aria-label="Resumen de actividad">
+        <Row className="g-3" aria-label="Resumen de actividad">
           {stats.map((stat) => (
-            <div className="col-sm-6 col-xl-3" key={stat.title}>
+            <Col sm={6} xl={3} key={stat.title}>
               <StatCard {...stat} />
-            </div>
+            </Col>
           ))}
-        </div>
+        </Row>
       </section>
 
-      <section className="dash-panel" id="plan-de-hoy" style={{ '--panel-accent': 'var(--sf-primary)' }}>
-        <SectionHeader title="Plan de hoy" subtitle="Tus tareas prioritarias para esta jornada." />
-        <div>
-            <div className="d-flex flex-column gap-2">
-              {tasks.map((task) => <TaskItem key={task.title} {...task} />)}
-            </div>
-          </div>
-        </section>
+      <PanelSection id="plan-de-hoy" tone="primary" title="Plan de hoy" subtitle="Tus tareas prioritarias para esta jornada.">
+        <Stack gap={2}>
+          {tasks.map((task) => <TaskItem key={task.title} {...task} />)}
+        </Stack>
+      </PanelSection>
 
-      <section className="dash-panel" id="materias" style={{ '--panel-accent': 'var(--sf-blue)' }}>
-        <SectionHeader title="Mis materias" subtitle="Consultá el progreso de cada materia." actionLabel="Ver todas" />
-        <div className="row g-3">
+      <PanelSection id="materias" tone="info" title="Mis materias" subtitle="Consultá el progreso de cada materia." actionLabel="Ver todas">
+        <Row className="g-3">
           {subjects.map((subject) => (
-            <div className="col-md-6 col-xl-4" key={subject.name}>
+            <Col md={6} xl={4} key={subject.name}>
               <SubjectCard {...subject} />
-            </div>
+            </Col>
           ))}
-        </div>
-      </section>
+        </Row>
+      </PanelSection>
 
-      <section className="dash-panel" id="mis-apuntes" style={{ '--panel-accent': 'var(--sf-yellow)' }}>
-        <SectionHeader title="Mis apuntes" subtitle="Tus materiales recientes." actionLabel="Ver apuntes" />
-        <div className="row g-3">
+      <PanelSection id="mis-apuntes" tone="warning" title="Mis apuntes" subtitle="Tus materiales recientes." actionLabel="Ver apuntes">
+        <Row className="g-3">
           {notes.map((note) => (
-            <div className="col-md-6 col-xl-4" key={note.title}>
+            <Col md={6} xl={4} key={note.title}>
               <NoteCard {...note} />
-            </div>
+            </Col>
           ))}
-        </div>
-      </section>
+        </Row>
+      </PanelSection>
 
-      <section className="dash-panel" id="proximos-examenes" style={{ '--panel-accent': 'var(--sf-accent)' }}>
-        <SectionHeader title="Próximos exámenes" subtitle="No pierdas de vista tus fechas importantes." />
-        <div className="row g-3">
+      <PanelSection id="proximos-examenes" tone="danger" title="Próximos exámenes" subtitle="No pierdas de vista tus fechas importantes.">
+        <Row className="g-3">
           {exams.map((exam) => (
-            <div className="col-md-6 col-xl-4" key={exam.title}>
+            <Col md={6} xl={4} key={exam.title}>
               <ExamCard {...exam} />
-            </div>
+            </Col>
           ))}
-        </div>
-      </section>
+        </Row>
+      </PanelSection>
 
-      <section className="dash-panel" id="mi-progreso" style={{ '--panel-accent': 'var(--sf-primary)' }}>
-        <SectionHeader title="Mi progreso" subtitle="Seguimiento de tus objetivos de estudio." />
-        <div>
-            <ProgressBar label="Objetivo semanal" value={72} detail="8h 40m de 12h completadas" />
-            <ProgressBar label="Materias al día" value={64} detail="3 de 5 materias con actividad reciente" />
-          </div>
-        </section>
+      <PanelSection id="mi-progreso" tone="primary" title="Mi progreso" subtitle="Seguimiento de tus objetivos de estudio.">
+        <ProgressBar label="Objetivo semanal" value={72} detail="8h 40m de 12h completadas" />
+        <ProgressBar label="Materias al día" value={64} detail="3 de 5 materias con actividad reciente" />
+      </PanelSection>
 
-      <section className="dash-panel" id="tecnicas-estudio" style={{ '--panel-accent': 'var(--sf-yellow)' }}>
-        <SectionHeader title="Técnicas de estudio" subtitle="Elegí una estrategia para tu próxima sesión." />
-        <div className="row g-3">
+      <PanelSection id="tecnicas-estudio" tone="warning" title="Técnicas de estudio" subtitle="Elegí una estrategia para tu próxima sesión.">
+        <Row className="g-3">
           {techniques.map((technique) => (
-            <div className="col-md-6 col-xl-4" key={technique.title}>
+            <Col md={6} xl={4} key={technique.title}>
               <TechniqueCard {...technique} />
-            </div>
+            </Col>
           ))}
-        </div>
-      </section>
+        </Row>
+      </PanelSection>
 
-      <section className="dash-panel" id="pomodoro" style={{ '--panel-accent': 'var(--sf-accent)' }}>
-        <SectionHeader title="Pomodoro" subtitle="Una sesión rápida para empezar a estudiar." />
-        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <div>
-              <span className="badge text-bg-primary mb-2">Enfoque</span>
-              <h3 className="h4 mb-1">25:00</h3>
-              <p className="text-secondary mb-0">Preparado para comenzar una sesión.</p>
-            </div>
-            <button className="btn btn-primary js-pomodoro-start">
-              <i className="bi bi-play-fill me-1"></i> Iniciar
-            </button>
+      <PanelSection id="pomodoro" tone="danger" title="Pomodoro" subtitle="Una sesión rápida para empezar a estudiar.">
+        <Stack direction="horizontal" gap={3} className="flex-wrap justify-content-between">
+          <div>
+            <Badge bg="primary" className="mb-2">Enfoque</Badge>
+            <h3 className="h4 mb-1">25:00</h3>
+            <p className="text-secondary mb-0">Preparado para comenzar una sesión.</p>
           </div>
-        </section>
+          <Button variant="primary" className="js-pomodoro-start">
+            <i className="bi bi-play-fill me-1"></i> Iniciar
+          </Button>
+        </Stack>
+      </PanelSection>
 
-      <section className="dash-panel" id="estadisticas" style={{ '--panel-accent': 'var(--sf-blue)' }}>
-        <SectionHeader title="Estadísticas" subtitle="Visualizá tus hábitos y horas de estudio." />
-        <div>
-            <ProgressBar label="Constancia semanal" value={78} detail="5 días activos esta semana" />
-            <ProgressBar label="Cumplimiento de tareas" value={83} detail="10 de 12 tareas completadas" />
-          </div>
-        </section>
+      <PanelSection id="estadisticas" tone="info" title="Estadísticas" subtitle="Visualizá tus hábitos y horas de estudio.">
+        <ProgressBar label="Constancia semanal" value={78} detail="5 días activos esta semana" />
+        <ProgressBar label="Cumplimiento de tareas" value={83} detail="10 de 12 tareas completadas" />
+      </PanelSection>
 
-      <section className="dash-panel" id="ia-asistente" style={{ '--panel-accent': 'var(--sf-primary)' }}>
-        <SectionHeader title="IA Asistente" subtitle="Herramientas para resumir, practicar y organizar tus materiales." />
-        <div>
-            <div className="d-flex align-items-start gap-3">
-              <div className="rounded-3 bg-primary-subtle text-primary p-3">
-                <i className="bi bi-robot fs-3"></i>
-              </div>
-              <div>
-                <h3 className="h5">Asistente de estudio</h3>
-                <p className="text-secondary mb-3">Cargá un documento para generar resúmenes o preguntas de práctica.</p>
-                <button className="btn btn-outline-primary">Abrir asistente</button>
-              </div>
-            </div>
+      <PanelSection id="ia-asistente" tone="primary" title="IA Asistente" subtitle="Herramientas para resumir, practicar y organizar tus materiales.">
+        <Stack direction="horizontal" gap={3} className="align-items-start">
+          <ToneIcon icon="bi-robot fs-3" tone="primary" size={60} />
+          <div>
+            <h3 className="h5">Asistente de estudio</h3>
+            <p className="text-secondary mb-3">Cargá un documento para generar resúmenes o preguntas de práctica.</p>
+            <Button variant="outline-primary">Abrir asistente</Button>
           </div>
-        </section>
+        </Stack>
+      </PanelSection>
     </>
   )
 }

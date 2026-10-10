@@ -1,17 +1,18 @@
 import { Outlet } from 'react-router-dom'
-import AppNavbar from '../components/AppNavbar'
+import Container from 'react-bootstrap/Container'
 import Sidebar from '../components/Sidebar'
+import AppNavbar from '../components/AppNavbar'
 
 export default function AppLayout() {
   return (
-    <>
-      <AppNavbar brand="Studify" />
-      <div className="app-shell">
-        <Sidebar activeItem="Inicio" />
-        <main className="app-main" id="inicio">
+    <div className="d-flex">
+      <Sidebar />
+      <div className="flex-grow-1" style={{ minWidth: 0 }}>
+        <AppNavbar />
+        <Container as="main" fluid className="px-3 px-lg-5 py-4" style={{ maxWidth: 1180 }}>
           <Outlet />
-        </main>
+        </Container>
       </div>
-    </>
+    </div>
   )
 }
