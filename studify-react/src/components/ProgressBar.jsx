@@ -1,13 +1,14 @@
+import BsProgressBar from 'react-bootstrap/ProgressBar'
+import Stack from 'react-bootstrap/Stack'
+
 export default function ProgressBar({ label, value, detail }) {
   return (
     <div className="mb-3">
-      <div className="d-flex justify-content-between fw-semibold mb-1">
+      <Stack direction="horizontal" className="justify-content-between fw-semibold mb-1">
         <span>{label}</span>
         <span>{value}%</span>
-      </div>
-      <div className="progress" role="progressbar" aria-label={label} aria-valuenow={value} aria-valuemin="0" aria-valuemax="100" style={{ height: 10 }}>
-        <div className="progress-bar" style={{ width: `${value}%` }}></div>
-      </div>
+      </Stack>
+      <BsProgressBar now={value} aria-label={label} className="rounded-pill" style={{ height: 9 }} />
       <p className="text-secondary small mb-0 mt-1">{detail}</p>
     </div>
   )

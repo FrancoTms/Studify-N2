@@ -7,6 +7,7 @@ import Card from 'react-bootstrap/Card'
 import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/Button'
+import Stack from 'react-bootstrap/Stack'
 import usePageTitle from '../hooks/usePageTitle'
 
 const highlights = [
@@ -29,10 +30,7 @@ function validate({ email, password }) {
 function Brand({ className = '', markClassName = 'bg-primary text-white' }) {
   return (
     <Link to="/" className={`d-inline-flex align-items-center gap-2 fw-bold fs-4 text-reset ${className}`}>
-      <span
-        className={`d-flex align-items-center justify-content-center rounded-3 ${markClassName}`}
-        style={{ width: 40, height: 40 }}
-      >
+      <span className={`rounded-3 p-2 lh-1 ${markClassName}`}>
         <i className="bi bi-book-half fs-5"></i>
       </span>
       Studify
@@ -63,30 +61,27 @@ export default function Login() {
   return (
     <Container fluid className="p-0">
       <Row className="g-0 min-vh-100">
-        <Col lg={5} className="login-aside d-none d-lg-flex flex-column justify-content-between p-5 text-white">
+        <Col lg={5} className="bg-hero d-none d-lg-flex flex-column justify-content-between p-5 text-white">
           <Brand markClassName="bg-white bg-opacity-10 text-white" />
           <div>
             <h2 className="display-6 fw-bold mb-2">Tu espacio para enfocarte.</h2>
             <p className="text-white-50 mb-4">Organizá tus materias, apuntes y exámenes en un solo lugar.</p>
-            <ul className="list-unstyled d-grid gap-3 mb-0">
+            <Stack as="ul" gap={3} className="list-unstyled mb-0">
               {highlights.map(({ icon, text }) => (
-                <li key={text} className="d-flex align-items-center gap-3">
-                  <span
-                    className="d-flex align-items-center justify-content-center flex-shrink-0 rounded-3 bg-white bg-opacity-10 text-warning"
-                    style={{ width: 36, height: 36 }}
-                  >
+                <Stack as="li" direction="horizontal" gap={3} key={text}>
+                  <span className="rounded-3 bg-white bg-opacity-10 text-warning p-2 lh-1 flex-shrink-0">
                     <i className={`bi ${icon}`}></i>
                   </span>
                   {text}
-                </li>
+                </Stack>
               ))}
-            </ul>
+            </Stack>
           </div>
         </Col>
 
         <Col xs={12} lg={7} as="main" className="d-flex flex-column align-items-center justify-content-center gap-4 p-4">
           <Brand className="d-lg-none" />
-          <Card className="w-100 border-0 shadow-sm" style={{ maxWidth: 440 }}>
+          <Card className="w-100 border-0 shadow-sm rounded-4" style={{ maxWidth: 440 }}>
             <Card.Body className="p-4 p-md-5">
               <h1 className="h3 fw-bold mb-1">Ingresá a Studify</h1>
               <p className="text-secondary mb-4">Retomá tus materias, apuntes y tareas donde los dejaste.</p>

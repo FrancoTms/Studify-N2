@@ -1,4 +1,5 @@
 import Nav from 'react-bootstrap/Nav'
+import Stack from 'react-bootstrap/Stack'
 
 const items = [
   { icon: 'bi-house-door-fill', label: 'Inicio', href: '#inicio' },
@@ -15,48 +16,58 @@ const items = [
   { icon: 'bi-gear-fill', label: 'Configuración', href: '#configuracion' },
 ]
 
-function NavItem({ item, active = false }) {
-  return (
-    <Nav.Item>
-      <Nav.Link
-        href={item.href}
-        className={`d-flex align-items-center gap-2 ${active ? 'active' : 'text-body'}`}
-      >
-        <i className={`bi ${item.icon}`}></i>
-        {item.label}
-      </Nav.Link>
-    </Nav.Item>
-  )
-}
-
 export default function Sidebar({ activeItem = 'Inicio' }) {
   return (
-    <aside className="col-lg-3 col-xl-2 d-none d-lg-flex flex-column bg-white border-end vh-100 sticky-top p-3">
-      <div className="d-flex align-items-center gap-2 border-bottom pb-3 mb-3">
-        <div className="d-flex align-items-center justify-content-center rounded-3 bg-primary text-white"
-             style={{ width: 40, height: 40 }}>
+    <aside
+      className="d-none d-lg-flex flex-column flex-shrink-0 align-self-start sticky-top vh-100 bg-sidebar text-white p-3"
+      style={{ width: 276 }}
+    >
+      <Stack
+        direction="horizontal"
+        gap={2}
+        className="border-bottom border-white border-opacity-10 pb-3 mb-3"
+      >
+        <div className="bg-primary text-white rounded-3 p-2 lh-1">
           <i className="bi bi-book-half fs-4"></i>
         </div>
         <div>
           <p className="h5 mb-0 fw-bold">Studify</p>
-          <p className="mb-0 text-secondary small">Tu espacio para enfocarte.</p>
+          <p className="mb-0 text-white-50 small">Tu espacio para enfocarte.</p>
         </div>
-      </div>
-      <Nav className="flex-column gap-1 flex-grow-1">
-        {items.map((item) => (
-          <NavItem key={item.label} item={item} active={item.label === activeItem} />
-        ))}
+      </Stack>
+
+      <Nav variant="pills" className="flex-column flex-nowrap gap-1 flex-grow-1 overflow-auto">
+        {items.map((item) => {
+          const active = item.label === activeItem
+          return (
+            <Nav.Link
+              key={item.label}
+              href={item.href}
+              active={active}
+              className={`d-flex align-items-center gap-2 rounded-3 fw-semibold small ${
+                active ? 'bg-primary-subtle text-dark' : 'text-white-50'
+              }`}
+            >
+              <i className={`bi ${item.icon}`}></i>
+              {item.label}
+            </Nav.Link>
+          )
+        })}
       </Nav>
-      <div className="d-flex align-items-center gap-2 border-top pt-3 mt-3">
-        <div className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center"
-             style={{ width: 40, height: 40 }}>
-          <i className="bi bi-person-fill"></i>
+
+      <Stack
+        direction="horizontal"
+        gap={2}
+        className="border-top border-white border-opacity-10 pt-3 mt-3"
+      >
+        <div className="bg-primary-subtle text-primary rounded-circle p-2 lh-1">
+          <i className="bi bi-person-fill fs-5"></i>
         </div>
         <div>
           <p className="mb-0 fw-semibold small">Usuario</p>
-          <p className="mb-0 text-secondary small">estudiante@mail.com</p>
+          <p className="mb-0 text-white-50 small">estudiante@mail.com</p>
         </div>
-      </div>
+      </Stack>
     </aside>
   )
 }
