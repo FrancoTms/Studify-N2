@@ -1,8 +1,6 @@
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Stack from 'react-bootstrap/Stack'
-import Badge from 'react-bootstrap/Badge'
-import Button from 'react-bootstrap/Button'
 import SectionHeader from '../components/SectionHeader'
 import PanelSection from '../components/PanelSection'
 import StatCard from '../components/StatCard'
@@ -12,7 +10,9 @@ import ExamCard from '../components/ExamCard'
 import TaskItem from '../components/TaskItem'
 import TechniqueCard from '../components/TechniqueCard'
 import ProgressBar from '../components/ProgressBar'
-import ToneIcon from '../components/ToneIcon'
+import PomodoroTimer from '../components/PomodoroTimer'
+import ChatAssistant from '../components/ChatAssistant'
+import WeeklyChart from '../components/WeeklyChart'
 import usePageTitle from '../hooks/usePageTitle'
 
 const stats = [
@@ -50,6 +50,16 @@ const techniques = [
   { icon: 'bi-stopwatch', title: 'Pomodoro', description: 'Estudiá en intervalos de concentración y descanso.', duration: '25 + 5 min' },
   { icon: 'bi-diagram-3', title: 'Mapas mentales', description: 'Relacioná conceptos para comprender mejor los temas.', duration: '15–30 min' },
   { icon: 'bi-question-circle', title: 'Active Recall', description: 'Intentá recuperar la información sin mirar los apuntes.', duration: '20 min' },
+]
+
+const weeklyHours = [
+  { day: 'Lun', hours: 2 },
+  { day: 'Mar', hours: 1.5 },
+  { day: 'Mié', hours: 3 },
+  { day: 'Jue', hours: 2.5 },
+  { day: 'Vie', hours: 1 },
+  { day: 'Sáb', hours: 2.5 },
+  { day: 'Dom', hours: 0 },
 ]
 
 export default function Dashboard() {
@@ -126,32 +136,15 @@ export default function Dashboard() {
       </PanelSection>
 
       <PanelSection id="pomodoro" tone="danger" title="Pomodoro" subtitle="Una sesión rápida para empezar a estudiar.">
-        <Stack direction="horizontal" gap={3} className="flex-wrap justify-content-between">
-          <div>
-            <Badge bg="primary" className="mb-2">Enfoque</Badge>
-            <h3 className="h4 mb-1">25:00</h3>
-            <p className="text-secondary mb-0">Preparado para comenzar una sesión.</p>
-          </div>
-          <Button variant="primary" className="js-pomodoro-start">
-            <i className="bi bi-play-fill me-1"></i> Iniciar
-          </Button>
-        </Stack>
+        <PomodoroTimer />
       </PanelSection>
 
       <PanelSection id="estadisticas" tone="info" title="Estadísticas" subtitle="Visualizá tus hábitos y horas de estudio.">
-        <ProgressBar label="Constancia semanal" value={78} detail="5 días activos esta semana" />
-        <ProgressBar label="Cumplimiento de tareas" value={83} detail="10 de 12 tareas completadas" />
+        <WeeklyChart data={weeklyHours} />
       </PanelSection>
 
-      <PanelSection id="ia-asistente" tone="primary" title="IA Asistente" subtitle="Herramientas para resumir, practicar y organizar tus materiales.">
-        <Stack direction="horizontal" gap={3} className="align-items-start">
-          <ToneIcon icon="bi-robot fs-3" tone="primary" size={60} />
-          <div>
-            <h3 className="h5">Asistente de estudio</h3>
-            <p className="text-secondary mb-3">Cargá un documento para generar resúmenes o preguntas de práctica.</p>
-            <Button variant="outline-primary">Abrir asistente</Button>
-          </div>
-        </Stack>
+      <PanelSection id="ia-asistente" tone="primary" title="IA Asistente" subtitle="Preguntale al asistente sobre técnicas, organización y exámenes.">
+        <ChatAssistant />
       </PanelSection>
     </>
   )
