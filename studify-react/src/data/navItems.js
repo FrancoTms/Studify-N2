@@ -9,6 +9,8 @@ export const navItems = [
   { icon: 'bi-alarm-fill', label: 'Pomodoro', href: '#pomodoro' },
   { icon: 'bi-lightbulb-fill', label: 'Técnicas de Estudio', href: '#tecnicas-estudio' },
   { icon: 'bi-robot', label: 'IA Asistente', href: '#ia-asistente' },
+  { icon: 'bi-search', label: 'Buscar en Wikipedia', href: '#wikipedia' },
   { icon: 'bi-calendar3', label: 'Calendario', href: '#calendario' },
   { icon: 'bi-gear-fill', label: 'Configuración', href: '#configuracion' },
 ]
+ 
