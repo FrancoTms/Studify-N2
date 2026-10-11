@@ -14,6 +14,7 @@ import PomodoroTimer from '../components/PomodoroTimer'
 import ChatAssistant from '../components/ChatAssistant'
 import WeeklyChart from '../components/WeeklyChart'
 import CalendarView from '../components/CalendarView'
+import WikiSearch from '../components/WikiSearch'
 import usePageTitle from '../hooks/usePageTitle'
 import { events } from '../data/events'
 import { daysFromToday, formatDay } from '../utils/dates'
@@ -151,10 +152,14 @@ export default function Dashboard() {
         <WeeklyChart data={weeklyHours} />
       </PanelSection>
 
+      <PanelSection id="wikipedia" tone="warning" title="Buscar en Wikipedia" subtitle="Investigá un tema sin salir de Studify.">
+        <WikiSearch />
+      </PanelSection>
+
       <PanelSection id="calendario" tone="info" title="Calendario" subtitle="Tus exámenes, entregas y sesiones de estudio.">
         <CalendarView />
       </PanelSection>
-
+      
       <PanelSection id="ia-asistente" tone="primary" title="IA Asistente" subtitle="Preguntale al asistente sobre técnicas, organización y exámenes.">
         <ChatAssistant />
       </PanelSection>
