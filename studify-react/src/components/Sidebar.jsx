@@ -27,9 +27,12 @@ export default function Sidebar({ activeItem = 'Inicio' }) {
         gap={2}
         className="border-bottom border-white border-opacity-10 pb-3 mb-3"
       >
-        <div className="bg-primary text-white rounded-3 p-2 lh-1">
-          <i className="bi bi-book-half fs-4"></i>
-        </div>
+        <img
+          src="/img/mascota-sidebar.png"
+          alt="Mascota de Studify"
+          className="studify-mascot"
+        />
+
         <div>
           <p className="h5 mb-0 fw-bold">Studify</p>
           <p className="mb-0 text-white-50 small">Tu espacio para enfocarte.</p>

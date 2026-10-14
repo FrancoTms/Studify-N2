@@ -57,3 +57,75 @@ h1, h2, h3, h4, h5, h6 { font-family: "Manrope", "DM Sans", sans-serif; }
 
 /* Para que los links del sidebar no queden tapados por la navbar mobile */
 section[id] { scroll-margin-top: 84px; }
+
+.studify-mascot {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.studify-mascot:hover {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+
+/* Bienvenida de Studify con su mascota */
+
+.studify-welcome {
+  position: relative;
+  overflow: hidden;
+}
+
+.studify-welcome-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.studify-welcome-text {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.studify-welcome-cat {
+  width: 190px;
+  height: 190px;
+  object-fit: contain;
+  flex-shrink: 0;
+  animation: catFloat 3.5s ease-in-out infinite;
+}
+
+@keyframes catFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Adaptación para celulares */
+@media (max-width: 576px) {
+  .studify-welcome-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .studify-welcome-cat {
+    width: 140px;
+    height: 140px;
+  }
+}
+
+/* Accesibilidad: respetar movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .studify-welcome-cat {
+    animation: none;
+  }
+}
