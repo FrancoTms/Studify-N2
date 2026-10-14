@@ -1,81 +1,86 @@
+
+/* PALETA GENERAL DE STUDIFY */
 :root {
-  --bs-primary: #0f766e;
-  --bs-primary-rgb: 15, 118, 110;
-  --bs-danger-rgb: 232, 111, 81;
-  --bs-warning-rgb: 231, 184, 75;
-  --bs-info-rgb: 71, 120, 168;
-  --bs-success-rgb: 39, 134, 111;
-  --bs-primary-bg-subtle: #dff3ee;
-  --bs-link-color: #0f766e;
-  --bs-body-bg: #f7f4ed;
-  --bs-body-color: #19302d;
-  --bs-border-color: #dedbd1;
-  --bs-body-font-family: "DM Sans", "Segoe UI", sans-serif;
-  --bs-border-radius: .9rem;
-  --sf-surface: #fffdf8;
+  --bs-primary: #238fbb;
+  --bs-primary-rgb: 35, 143, 187;
+  --bs-primary-bg-subtle: #d9f2ff;
+  --bs-info-bg-subtle: #d9f2ff;
+  --bs-body-bg: #f5f9ff;
+  --bs-body-color: #17324d;
+  --bs-border-color: #c8ddea;
+  --bs-link-color: #238fbb;
+  --bs-body-font-family: "DM Sans", sans-serif;
+  --sf-surface: #ffffff;
 }
 
 [data-bs-theme="dark"] {
-  --bs-primary: #54c6b2;
-  --bs-primary-rgb: 84, 198, 178;
-  --bs-primary-bg-subtle: #163d3a;
-  --bs-link-color: #65d1be;
-  --bs-body-bg: #0b1719;
-  --bs-body-color: #e7f1ee;
-  --bs-border-color: #284044;
-  --sf-surface: #112326;
+  --bs-primary: #63d7ee;
+  --bs-primary-rgb: 99, 215, 238;
+  --bs-primary-bg-subtle: #173b52;
+  --bs-info-bg-subtle: #193b50;
+  --bs-body-bg: #0b1828;
+  --bs-body-color: #edf8ff;
+  --bs-border-color: #304b63;
+  --bs-link-color: #63d7ee;
+  --sf-surface: #142739;
 }
 
-h1, h2, h3, h4, h5, h6 { font-family: "Manrope", "DM Sans", sans-serif; }
+/* ESTILOS GENERALES */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Manrope", sans-serif;
+}
 
-.card { --bs-card-bg: var(--sf-surface); }
+.card {
+  --bs-card-bg: var(--sf-surface);
+}
 
 .btn-primary {
   --bs-btn-bg: var(--bs-primary);
   --bs-btn-border-color: var(--bs-primary);
   --bs-btn-hover-bg: var(--bs-primary);
   --bs-btn-hover-border-color: var(--bs-primary);
-  --bs-btn-active-bg: var(--bs-primary);
-  --bs-btn-active-border-color: var(--bs-primary);
 }
-.btn-primary:hover { filter: brightness(.9); }
 
-/* En modo oscuro el primario es claro: el texto del botón tiene que ser oscuro */
 [data-bs-theme="dark"] .btn-primary {
-  --bs-btn-color: #071517;
-  --bs-btn-hover-color: #071517;
-  --bs-btn-active-color: #071517;
-  --bs-btn-disabled-color: #071517;
+  --bs-btn-color: #102b42;
+  --bs-btn-hover-color: #102b42;
 }
 
-.bg-sidebar { background: #173b37; }
-[data-bs-theme="dark"] .bg-sidebar { background: #071517; }
-.bg-hero { background: linear-gradient(115deg, #0d625c, #176f67 55%, #27857a); }
+/* SIDEBAR Y DASHBOARD */
+.bg-sidebar {
+  background: #102b42;
+}
 
-.hover-lift { transition: transform .2s ease, box-shadow .2s ease; }
-.hover-lift:hover { transform: translateY(-4px); box-shadow: var(--bs-box-shadow) !important; }
+.bg-hero {
+  background: linear-gradient(120deg, #175582, #289fc0);
+}
 
-/* Para que los links del sidebar no queden tapados por la navbar mobile */
-section[id] { scroll-margin-top: 84px; }
+.hover-lift {
+  transition: transform .2s ease;
+}
 
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+section[id] {
+  scroll-margin-top: 84px;
+}
+
+/* MASCOTA */
 .studify-mascot {
   width: 44px;
   height: 44px;
   object-fit: contain;
-  border-radius: 12px;
-  flex-shrink: 0;
-  transition: transform 0.25s ease;
+  transition: transform .25s;
 }
 
 .studify-mascot:hover {
   transform: scale(1.08) rotate(-4deg);
 }
 
-
-/* Bienvenida de Studify con su mascota */
-
+/* BIENVENIDA */
 .studify-welcome {
-  position: relative;
   overflow: hidden;
 }
 
@@ -86,31 +91,31 @@ section[id] { scroll-margin-top: 84px; }
   gap: 24px;
 }
 
-.studify-welcome-text {
-  flex: 1;
-  position: relative;
-  z-index: 1;
-}
-
 .studify-welcome-cat {
   width: 190px;
-  height: 190px;
+  max-width: 35%;
   object-fit: contain;
-  flex-shrink: 0;
-  animation: catFloat 3.5s ease-in-out infinite;
 }
 
-@keyframes catFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
+/* FONDO CON LIBRITOS */
+.studify-login-bg {
+  background-color: #f5f9ff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cg opacity='.25' fill='none' stroke='%239fc4ea' stroke-width='1.5'%3E%3Cpath d='M22 24h11v15H22zM33 24h11v15H33zM33 24v15'/%3E%3C/g%3E%3C/svg%3E");
+}
 
+/* ANIMACIÓN COMPARTIDA */
+.studify-welcome-cat,
+.studify-login-cat {
+  animation: flotar 3.5s ease-in-out infinite;
+}
+
+@keyframes flotar {
   50% {
     transform: translateY(-10px);
   }
 }
 
-/* Adaptación para celulares */
+/* RESPONSIVE Y ACCESIBILIDAD */
 @media (max-width: 576px) {
   .studify-welcome-content {
     flex-direction: column;
@@ -119,13 +124,13 @@ section[id] { scroll-margin-top: 84px; }
 
   .studify-welcome-cat {
     width: 140px;
-    height: 140px;
+    max-width: 100%;
   }
 }
 
-/* Accesibilidad: respetar movimiento reducido */
 @media (prefers-reduced-motion: reduce) {
-  .studify-welcome-cat {
+  .studify-welcome-cat,
+  .studify-login-cat {
     animation: none;
   }
 }

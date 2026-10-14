@@ -58,84 +58,153 @@ export default function Login() {
     if (Object.keys(found).length === 0) navigate('/inicio')
   }
 
-  return (
-    <Container fluid className="p-0">
-      <Row className="g-0 min-vh-100">
-        <Col lg={5} className="bg-hero d-none d-lg-flex flex-column justify-content-between p-5 text-white">
-          <Brand markClassName="bg-white bg-opacity-10 text-white" />
-          <div>
-            <h2 className="display-6 fw-bold mb-2">Tu espacio para enfocarte.</h2>
-            <p className="text-white-50 mb-4">Organizá tus materias, apuntes y exámenes en un solo lugar.</p>
-            <Stack as="ul" gap={3} className="list-unstyled mb-0">
-              {highlights.map(({ icon, text }) => (
-                <Stack as="li" direction="horizontal" gap={3} key={text}>
-                  <span className="rounded-3 bg-white bg-opacity-10 text-warning p-2 lh-1 flex-shrink-0">
-                    <i className={`bi ${icon}`}></i>
-                  </span>
-                  {text}
-                </Stack>
-              ))}
-            </Stack>
-          </div>
-        </Col>
 
-        <Col xs={12} lg={7} as="main" className="d-flex flex-column align-items-center justify-content-center gap-4 p-4">
-          <Brand className="d-lg-none" />
-          <Card className="w-100 border-0 shadow-sm rounded-4" style={{ maxWidth: 440 }}>
-            <Card.Body className="p-4 p-md-5">
-              <h1 className="h3 fw-bold mb-1">Ingresá a Studify</h1>
-              <p className="text-secondary mb-4">Retomá tus materias, apuntes y tareas donde los dejaste.</p>
 
-              <Form noValidate onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="login-email">
-                  <Form.Label className="fw-semibold">Correo electrónico</Form.Label>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    placeholder="nombre@mail.com"
-                    autoComplete="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    isInvalid={!!errors.email}
-                  />
-                  <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
-                </Form.Group>
+return (
+  <div data-bs-theme="light" className="min-vh-100 studify-login-bg">
+    <header className="bg-info-subtle border-bottom py-3">
+      <Container fluid="lg">
+        <Link
+          to="/inicio"
+          className="d-inline-flex align-items-center gap-2
+                     text-primary fw-bold fs-3 text-decoration-none"
+        >
+          <img
+            src="/img/mascota-sidebar.png"
+            alt=""
+            width="45"
+            height="45"
+          />
+          Studify
+        </Link>
+      </Container>
+    </header>
 
-                <Form.Group className="mb-4" controlId="login-password">
-                  <Form.Label className="fw-semibold">Contraseña</Form.Label>
-                  <InputGroup hasValidation>
-                    <Form.Control
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      placeholder="Mínimo 6 caracteres"
-                      autoComplete="current-password"
-                      value={values.password}
-                      onChange={handleChange}
-                      isInvalid={!!errors.password}
-                    />
+    <Container className="py-5">
+      <Row className="justify-content-center">
+        <Col xs={12} lg={11} xl={10}>
+          <Card className="border-0 rounded-4 shadow overflow-hidden">
+            <Row className="g-0">
+              {/* Presentación de Studify */}
+              <Col
+                md={5 }
+                className="bg-info-subtle text-dark p-4 d-flex flex-column
+             justify-content-between align-items-center text-center gap-3"
+              >
+                <div>
+                  <h2 className="h5 fw-bold text-primary">
+                    ¡Preparémonos para estudiar!
+                  </h2>
+                  <p className="text-secondary small">
+                    Tu compañero de estudio te está esperando.
+                  </p>
+                </div>
+
+                <img
+  src="/img/mascota-login.png"
+  alt="Gatito de Studify preparando su mochila"
+  className="img-fluid studify-login-cat"
+  style={{ maxWidth: 260 }}
+/>
+
+                <div>
+                  <h3 className="h4 fw-bold">
+                    Aprendé a tu ritmo
+                  </h3>
+                  <p className="small mb-0">
+                    Organizá tus materias, apuntes
+                    y exámenes en un solo lugar.
+                  </p>
+                </div>
+              </Col>
+
+              {/* Formulario de ingreso */}
+              <Col
+                md={7}
+                className="bg-body p-4 p-lg-5 d-flex align-items-center"
+              >
+                <div className="w-100 mx-auto" style={{ maxWidth: 420 }}>
+                  <h1 className="h3 fw-bold mb-2">
+                    Bienvenido de nuevo
+                  </h1>
+
+                  <p className="text-primary fs-5 mb-4">
+                    Iniciá sesión para continuar
+                  </p>
+
+                  <Form noValidate onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3" controlId="login-email">
+                      <Form.Label>Correo electrónico</Form.Label>
+                      <Form.Control
+                        type="email"
+                        name="email"
+                        placeholder="nombre@mail.com"
+                        autoComplete="email"
+                        value={values.email}
+                        onChange={handleChange}
+                        isInvalid={!!errors.email}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.email}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="login-password">
+                      <Form.Label>Contraseña</Form.Label>
+                      <InputGroup hasValidation>
+                        <Form.Control
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          placeholder="Mínimo 6 caracteres"
+                          autoComplete="current-password"
+                          value={values.password}
+                          onChange={handleChange}
+                          isInvalid={!!errors.password}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline-secondary"
+                          onClick={() => setShowPassword(!showPassword)}
+                          aria-label={
+                            showPassword
+                              ? 'Ocultar contraseña'
+                              : 'Mostrar contraseña'
+                          }
+                        >
+                          {showPassword ? 'Ocultar' : 'Mostrar'}
+                        </Button>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.password}
+                        </Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
+
                     <Button
-                      variant="outline-secondary"
-                      onClick={() => setShowPassword((v) => !v)}
-                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                      aria-pressed={showPassword}
+                      type="submit"
+                      variant="primary"
+                      className="w-100 fw-semibold"
                     >
-                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                      Iniciar sesión
                     </Button>
-                    <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
-                  </InputGroup>
-                </Form.Group>
+                  </Form>
 
-                <Button type="submit" variant="primary" size="lg" className="w-100">Iniciar sesión</Button>
-              </Form>
+                  <hr className="my-4" />
 
-              <hr className="my-4" />
-              <p className="text-secondary text-center small mb-0">
-                ¿Querés ver la app antes? <Link to="/inicio" className="fw-semibold">Explorar sin iniciar sesión</Link>
-              </p>
-            </Card.Body>
+                  <p className="text-center small mb-0">
+                    ¿Querés conocer Studify?{' '}
+                    <Link to="/inicio">
+                      Explorar sin iniciar sesión
+                    </Link>
+                  </p>
+                </div>
+              </Col>
+            </Row>
           </Card>
         </Col>
       </Row>
     </Container>
-  )
+  </div>
+)
+
+
 }
