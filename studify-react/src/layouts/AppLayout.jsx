@@ -22,7 +22,10 @@ export default function AppLayout({ theme, onToggleTheme }) {
     <div className="d-flex">
       <Sidebar />
 
-      <div className="flex-grow-1" style={{ minWidth: 0 }}>
+     <div
+  className="flex-grow-1 studify-login-bg"
+  style={{ minWidth: 0 }}
+>
         <AppNavbar theme={theme} onToggleTheme={onToggleTheme} onLogout={askLogout} />
         <TopBar theme={theme} onToggleTheme={onToggleTheme} onLogout={askLogout} />
         <Container as="main" fluid className="px-3 px-lg-5 py-4" style={{ maxWidth: 1180 }}>

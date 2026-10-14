@@ -77,13 +77,14 @@ export default function Dashboard() {
   return (
     <>
 
+
 <header
   id="inicio"
-  className="bg-hero studify-welcome rounded-4 shadow p-4 p-lg-5 mb-4 text-white"
+  className="bg-info-subtle rounded-4 shadow-sm p-4 p-lg-5 mb-4"
 >
-  <div className="studify-welcome-content">
-    <div className="studify-welcome-text">
-      <p className="text-white-50 fw-semibold mb-2">
+  <Row className="align-items-center g-4">
+    <Col md={8}>
+      <p className="text-primary fw-semibold mb-2">
         TU ESPACIO DE ESTUDIO
       </p>
 
@@ -91,19 +92,30 @@ export default function Dashboard() {
         ¡Hola, estudiante! 👋
       </h1>
 
-      <p className="mb-0">
-        Cada día es una nueva oportunidad para aprender.
-        ¡Vamos a estudiar juntos!
+      <p className="text-body-secondary mb-3">
+        Organizá tus materias, repasá tus apuntes
+        y avanzá hacia tus objetivos.
       </p>
-    </div>
 
-    <img
-      src="/img/mascota-inicio.png"
-      alt="Gatito de Studify leyendo un libro"
-      className="studify-welcome-cat"
-    />
-  </div>
+      <a
+        href="#plan-de-hoy"
+        className="btn btn-primary rounded-pill px-4 py-2"
+      >
+        <i className="bi bi-book me-2"></i>
+        Comenzar a estudiar
+      </a>
+    </Col>
+
+    <Col md={4} className="text-center">
+      <img
+        src="/img/mascota-inicio.png"
+        alt="Mascota de Studify leyendo un libro"
+        className="img-fluid studify-welcome-cat"
+      />
+    </Col>
+  </Row>
 </header>
+
 
 
       <section className="mb-4">
