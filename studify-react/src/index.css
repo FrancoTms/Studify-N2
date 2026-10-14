@@ -22,6 +22,18 @@
   --bs-border-color: #304b63;
   --bs-link-color: #63d7ee;
   --sf-surface: #142739;
+  --bs-success-rgb: 90, 190, 150;
+  --bs-warning-rgb: 232, 190, 100;
+  --bs-danger-rgb: 232, 120, 120;
+  --bs-info-rgb: 120, 170, 235;
+  --bs-success-bg-subtle: rgba(var(--bs-success-rgb), .14);
+  --bs-warning-bg-subtle: rgba(var(--bs-warning-rgb), .14);
+  --bs-danger-bg-subtle: rgba(var(--bs-danger-rgb), .14);
+  --bs-primary-border-subtle: rgba(var(--bs-primary-rgb), .35);
+  --bs-info-border-subtle: rgba(var(--bs-info-rgb), .35);
+  --bs-success-border-subtle: rgba(var(--bs-success-rgb), .35);
+  --bs-warning-border-subtle: rgba(var(--bs-warning-rgb), .35);
+  --bs-danger-border-subtle: rgba(var(--bs-danger-rgb), .35);
 }
 
 /* ESTILOS GENERALES */
@@ -43,6 +55,25 @@ h1, h2, h3, h4, h5, h6 {
 [data-bs-theme="dark"] .btn-primary {
   --bs-btn-color: #102b42;
   --bs-btn-hover-color: #102b42;
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-bg: var(--bs-primary);
+  --bs-btn-hover-border-color: var(--bs-primary);
+  --bs-btn-active-bg: var(--bs-primary);
+  --bs-btn-active-border-color: var(--bs-primary);
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+  --bs-btn-hover-color: #102b42;
+  --bs-btn-active-color: #102b42;
+}
+[data-bs-theme="dark"] :is(.border-primary, .border-success, .border-info, .border-warning, .border-danger) {
+  --bs-border-opacity: .5;
+}
+[data-bs-theme="dark"] .badge {
+  --bs-badge-color: #102b42;
 }
 
 /* SIDEBAR Y DASHBOARD */
@@ -130,7 +161,6 @@ section[id] {
     transform: translateY(-10px);
   }
 }
-
 /* RESPONSIVE Y ACCESIBILIDAD */
 @media (max-width: 576px) {
   .studify-welcome-content {
@@ -143,14 +173,13 @@ section[id] {
     max-width: 100%;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .studify-welcome-cat,
   .studify-login-cat {
     animation: none;
   }
 }
-/*Animaciones gatos de las secciones*/
+/* Animaciones gatos de las secciones */
 @keyframes panel-in { from { opacity: 0; transform: translateY(12px); } }
 .panel-section { animation: panel-in .5s ease both; }
 .panel-mascot { transition: transform .3s ease; }
