@@ -76,11 +76,35 @@ export default function Dashboard() {
 
   return (
     <>
-      <header id="inicio" className="bg-hero rounded-4 shadow p-4 p-lg-5 mb-4 text-white">
-        <p className="text-white-50 fw-semibold mb-1">Tu espacio de estudio</p>
-        <h1 className="display-6 fw-bold mb-1">Hola, estudiante</h1>
-        <p className="text-white-50 mb-0">Organizá tu tiempo, mantené el foco y seguí tu progreso.</p>
-      </header>
+
+<header
+  id="inicio"
+  className="bg-hero studify-welcome rounded-4 shadow p-4 p-lg-5 mb-4 text-white"
+>
+  <div className="studify-welcome-content">
+    <div className="studify-welcome-text">
+      <p className="text-white-50 fw-semibold mb-2">
+        TU ESPACIO DE ESTUDIO
+      </p>
+
+      <h1 className="display-6 fw-bold mb-3">
+        ¡Hola, estudiante! 👋
+      </h1>
+
+      <p className="mb-0">
+        Cada día es una nueva oportunidad para aprender.
+        ¡Vamos a estudiar juntos!
+      </p>
+    </div>
+
+    <img
+      src="/img/mascota-inicio.png"
+      alt="Gatito de Studify leyendo un libro"
+      className="studify-welcome-cat"
+    />
+  </div>
+</header>
+
 
       <section className="mb-4">
         <SectionHeader title="Resumen" subtitle="Una vista rápida de tu actividad." />
