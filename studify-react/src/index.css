@@ -56,11 +56,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hover-lift {
-  transition: transform .2s ease;
+  transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(28, 72, 110, 0.16) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift {
+    transition: none;
+  }
+
+  .hover-lift:hover {
+    transform: none;
+  }
 }
 
 section[id] {
@@ -101,6 +112,12 @@ section[id] {
 .studify-login-bg {
   background-color: #f5f9ff;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cg opacity='.25' fill='none' stroke='%239fc4ea' stroke-width='1.5'%3E%3Cpath d='M22 24h11v15H22zM33 24h11v15H33zM33 24v15'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Fondo con libros: tema oscuro */
+[data-bs-theme="dark"] .studify-login-bg {
+  background-color: #0b1828;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cg opacity='.10' fill='none' stroke='%2363d7ee' stroke-width='1.5'%3E%3Cpath d='M22 24h11v15H22zM33 24h11v15H33zM33 24v15'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* ANIMACIÓN COMPARTIDA */
