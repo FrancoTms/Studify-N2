@@ -150,3 +150,9 @@ section[id] {
     animation: none;
   }
 }
+/*Animaciones gatos de las secciones*/
+@keyframes panel-in { from { opacity: 0; transform: translateY(12px); } }
+.panel-section { animation: panel-in .5s ease both; }
+.panel-mascot { transition: transform .3s ease; }
+.panel-section:hover .panel-mascot { transform: translateY(-4px) rotate(-3deg); }
+@media (prefers-reduced-motion: reduce) { .panel-section, .panel-mascot { animation: none; transition: none; } }

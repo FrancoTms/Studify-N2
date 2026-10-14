@@ -89,7 +89,7 @@ export default function Dashboard() {
       </p>
 
       <h1 className="display-6 fw-bold mb-3">
-        ¡Hola, estudiante! 👋
+        ¡Hola, estudiante!
       </h1>
 
       <p className="text-body-secondary mb-3">
