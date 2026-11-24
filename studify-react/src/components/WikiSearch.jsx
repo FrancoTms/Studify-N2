@@ -10,9 +10,11 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import Row from 'react-bootstrap/Row'
 import Spinner from 'react-bootstrap/Spinner'
 import Stack from 'react-bootstrap/Stack'
-import { showError, showWarning } from '../utils/alerts'
+import { showError, showToast, showWarning } from '../utils/alerts'
+import { useData } from '../context/contexts'
 
-const API_URL = import.meta.env.VITE_API_URL
+// Se puede cambiar con la variable VITE_API_URL; si no está definida se usa la Wikipedia en español
+const API_URL = import.meta.env.VITE_API_URL || 'https://es.wikipedia.org/w/api.php'
 
 const DEFAULT_TERM = 'Técnica Pomodoro'
 const SUGGESTIONS = ['Programación', 'Análisis de sistemas', 'Scrum', 'Mapa mental']
@@ -25,6 +27,7 @@ function getErrorMessage(error) {
 }
 
 export default function WikiSearch() {
+  const { addNote, notes } = useData()
   const [input, setInput] = useState(DEFAULT_TERM) // lo que el usuario escribe en el campo
   const [query, setQuery] = useState({ term: DEFAULT_TERM, nonce: 0 }) // busqueda enviada
   const [results, setResults] = useState([]) // datos que devuelve la API
@@ -33,13 +36,6 @@ export default function WikiSearch() {
 
   // Se ejecuta al montar el componente y cada vez que se envia una busqueda nueva 
   useEffect(() => {
-    if (!API_URL) {
-      const message = 'Falta la variable VITE_API_URL'
-      setError(message)
-      showError(message)
-      return undefined
-    }
-
     const controller = new AbortController()
 
     const fetchResults = async () => {
@@ -100,6 +96,18 @@ export default function WikiSearch() {
       return
     }
     search(term)
+  }
+
+  // Guarda el resumen del artículo como apunte (sin materia; se puede asignar después)
+  const isSaved = (page) => notes.some((n) => n.source === page.fullurl)
+  const saveAsNote = (page) => {
+    addNote({
+      title: page.title,
+      subjectId: null,
+      content: `${page.extract || 'Sin resumen disponible.'}\n\nFuente: ${page.fullurl}`,
+      source: page.fullurl,
+    })
+    showToast('Guardado en Mis apuntes')
   }
 
   const handleSuggestion = (term) => {
@@ -191,18 +199,28 @@ export default function WikiSearch() {
                       <Card.Text className="text-secondary small flex-grow-1">
                         {page.extract || 'Este artículo no tiene un resumen disponible.'}
                       </Card.Text>
-                      <Button
-                        as="a"
-                        href={page.fullurl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        variant="outline-primary"
-                        size="sm"
-                        className="align-self-start"
-                      >
-                        Leer en Wikipedia
-                        <i className="bi bi-box-arrow-up-right ms-2"></i>
-                      </Button>
+                      <Stack direction="horizontal" gap={2} className="flex-wrap">
+                        <Button
+                          as="a"
+                          href={page.fullurl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="outline-primary"
+                          size="sm"
+                        >
+                          Leer en Wikipedia
+                          <i className="bi bi-box-arrow-up-right ms-2"></i>
+                        </Button>
+                        <Button
+                          variant={isSaved(page) ? 'success' : 'outline-success'}
+                          size="sm"
+                          onClick={() => saveAsNote(page)}
+                          disabled={isSaved(page)}
+                        >
+                          <i className={`bi ${isSaved(page) ? 'bi-check-lg' : 'bi-journal-plus'} me-1`}></i>
+                          {isSaved(page) ? 'Guardado' : 'Guardar como apunte'}
+                        </Button>
+                      </Stack>
                     </Card.Body>
                   </Card>
                 </Col>

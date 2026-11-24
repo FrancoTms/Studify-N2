@@ -6,7 +6,8 @@ import Row from 'react-bootstrap/Row'
 import Stack from 'react-bootstrap/Stack'
 import Table from 'react-bootstrap/Table'
 import ToneIcon from './ToneIcon'
-import { events, EVENT_TYPES } from '../data/events'
+import { EVENT_TYPES } from '../data/events'
+import { useData } from '../context/contexts'
 import {
   addDays,
   capitalize,
@@ -15,7 +16,9 @@ import {
   isSameDay,
   startOfDay,
   startOfMonth,
+  toISODate,
 } from '../utils/dates'
+import { sortTasks } from '../utils/stats'
 
 const WEEKDAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -34,9 +37,20 @@ function buildWeeks(viewDate) {
   return weeks
 }
 
-const eventsOn = (day) => events.filter((e) => isSameDay(e.date, day))
+// onAdd(fecha), onEdit(evento) y onDelete(evento) los maneja la página que usa el calendario
+export default function CalendarView({ onAdd, onEdit, onDelete }) {
+  const { events, tasks, subjectName } = useData()
+  const eventsOn = (day) => {
+    const iso = toISODate(day)
+    return events
+      .filter((e) => e.date === iso)
+      .sort((a, b) => (a.time || '99').localeCompare(b.time || '99'))
+  }
+  const tasksOn = (day) => {
+    const iso = toISODate(day)
+    return tasks.filter((t) => t.dueDate === iso).sort(sortTasks)
+  }
 
-export default function CalendarView() {
   // Mes que se está mirando (siempre el día 1) y día elegido
   const [viewDate, setViewDate] = useState(() => startOfMonth(new Date()))
   const [selected, setSelected] = useState(() => startOfDay(new Date()))
@@ -44,6 +58,7 @@ export default function CalendarView() {
   const today = startOfDay(new Date())
   const weeks = buildWeeks(viewDate)
   const selectedEvents = eventsOn(selected)
+  const selectedTasks = tasksOn(selected)
 
   const goToMonth = (delta) =>
     setViewDate((d) => new Date(d.getFullYear(), d.getMonth() + delta, 1))
@@ -133,11 +148,11 @@ export default function CalendarView() {
                       >
                         <span className="d-block fw-semibold">{day.getDate()}</span>
                         <span className="d-flex justify-content-center gap-1 mt-1" style={{ minHeight: 8 }}>
-                          {dayEvents.map((e) => (
+                          {dayEvents.slice(0, 3).map((e) => (
                             <Badge
                               key={e.id}
                               pill
-                              bg={isSelected ? 'light' : EVENT_TYPES[e.type].tone}
+                              bg={isSelected ? 'light' : (EVENT_TYPES[e.type] ?? EVENT_TYPES.exam).tone}
                               className="p-1"
                               aria-hidden="true"
                             />
@@ -164,12 +179,22 @@ export default function CalendarView() {
 
       <Col lg={5}>
         <div className="bg-body-tertiary rounded-4 p-3 h-100">
-          <h3 className="h6 fw-bold mb-1">{capitalize(formatLongDay(selected))}</h3>
-          <p className="text-secondary small mb-3">
-            {selectedEvents.length === 0
-              ? 'Sin eventos'
-              : `${selectedEvents.length} ${selectedEvents.length === 1 ? 'evento' : 'eventos'}`}
-          </p>
+          <Stack direction="horizontal" gap={2} className="align-items-start mb-3">
+            <div className="flex-grow-1">
+              <h3 className="h6 fw-bold mb-1">{capitalize(formatLongDay(selected))}</h3>
+              <p className="text-secondary small mb-0">
+                {selectedEvents.length === 0
+                  ? 'Sin eventos'
+                  : `${selectedEvents.length} ${selectedEvents.length === 1 ? 'evento' : 'eventos'}`}
+              </p>
+            </div>
+            {onAdd && (
+              <Button size="sm" variant="primary" className="rounded-pill" onClick={() => onAdd(toISODate(selected))}>
+                <i className="bi bi-plus-lg me-1"></i>
+                Agregar
+              </Button>
+            )}
+          </Stack>
 
           {selectedEvents.length === 0 ? (
             <p className="text-secondary mb-0">
@@ -178,7 +203,7 @@ export default function CalendarView() {
           ) : (
             <Stack gap={2}>
               {selectedEvents.map((e) => {
-                const type = EVENT_TYPES[e.type]
+                const type = EVENT_TYPES[e.type] ?? EVENT_TYPES.exam
                 return (
                   <Stack
                     key={e.id}
@@ -187,15 +212,47 @@ export default function CalendarView() {
                     className="bg-body border rounded-3 p-3 align-items-start"
                   >
                     <ToneIcon icon={`${type.icon} fs-5`} tone={type.tone} />
-                    <div className="flex-grow-1">
-                      <p className="fw-semibold mb-0">{e.title}</p>
-                      <p className="text-secondary small mb-1">{e.subject}</p>
+                    <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                      <p className="fw-semibold mb-0 text-break">{e.title}</p>
+                      <p className="text-secondary small mb-1">
+                        {subjectName(e.subjectId)}
+                        {e.time && ` · ${e.time} h`}
+                      </p>
                       <Badge bg={`${type.tone}-subtle`} text={type.tone}>{type.label}</Badge>
                     </div>
+                    {(onEdit || onDelete) && (
+                      <Stack gap={1}>
+                        {onEdit && (
+                          <Button variant="link" size="sm" className="text-secondary p-1" onClick={() => onEdit(e)} aria-label={`Editar ${e.title}`} title="Editar">
+                            <i className="bi bi-pencil"></i>
+                          </Button>
+                        )}
+                        {onDelete && (
+                          <Button variant="link" size="sm" className="text-danger p-1" onClick={() => onDelete(e)} aria-label={`Eliminar ${e.title}`} title="Eliminar">
+                            <i className="bi bi-trash"></i>
+                          </Button>
+                        )}
+                      </Stack>
+                    )}
                   </Stack>
                 )
               })}
             </Stack>
+          )}
+
+          {selectedTasks.length > 0 && (
+            <>
+              <h4 className="h6 fw-bold mt-4 mb-2">Tareas que vencen este día</h4>
+              <Stack gap={2} as="ul" className="list-unstyled mb-0">
+                {selectedTasks.map((t) => (
+                  <li key={t.id} className="small">
+                    <i className={`bi ${t.completed ? 'bi-check-circle-fill text-success' : 'bi-circle text-secondary'} me-2`}></i>
+                    <span className={t.completed ? 'text-decoration-line-through text-secondary' : ''}>{t.title}</span>
+                    <span className="text-secondary"> · {subjectName(t.subjectId)}</span>
+                  </li>
+                ))}
+              </Stack>
+            </>
           )}
         </div>
       </Col>

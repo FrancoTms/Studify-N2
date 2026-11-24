@@ -10,10 +10,11 @@ const formatHours = (hours) => {
 }
 
 // data = [{ day: 'Lun', hours: 2.5 }, ...] empezando en lunes
-export default function WeeklyChart({ data }) {
+// highlightIndex = día resaltado (por defecto hoy; -1 para no resaltar ninguno)
+export default function WeeklyChart({ data, highlightIndex }) {
   const max = Math.max(...data.map((d) => d.hours), 1)
   const total = data.reduce((sum, d) => sum + d.hours, 0)
-  const today = (new Date().getDay() + 6) % 7 // 0 = lunes
+  const today = highlightIndex ?? (new Date().getDay() + 6) % 7 // 0 = lunes
 
   const summary = data.map((d) => `${d.day} ${formatHours(d.hours)}`).join(', ')
 
