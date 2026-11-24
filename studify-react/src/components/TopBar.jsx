@@ -1,6 +1,7 @@
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
 import Stack from 'react-bootstrap/Stack'
+import PomodoroBadge from './PomodoroBadge'
 
 export default function TopBar({ theme = 'light', onToggleTheme, onLogout }) {
   const isDark = theme === 'dark'
@@ -9,6 +10,7 @@ export default function TopBar({ theme = 'light', onToggleTheme, onLogout }) {
     <header className="d-none d-lg-block bg-body border-bottom sticky-top">
       <Container fluid className="px-5 py-2" style={{ maxWidth: 1180 }}>
         <Stack direction="horizontal" gap={2} className="justify-content-end">
+          <PomodoroBadge />
           <Button
             variant="outline-secondary"
             size="sm"

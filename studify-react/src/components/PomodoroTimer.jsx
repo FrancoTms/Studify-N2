@@ -1,71 +1,40 @@
-import { useEffect, useRef, useState } from 'react'
 import Badge from 'react-bootstrap/Badge'
 import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
 import ToggleButton from 'react-bootstrap/ToggleButton'
 import Stack from 'react-bootstrap/Stack'
-
-const MODES = {
-  focus: { label: 'Enfoque', tab: 'Enfoque', minutes: 25, tone: 'primary' },
-  short: { label: 'Descanso corto', tab: 'Corto', minutes: 5, tone: 'success' },
-  long: { label: 'Descanso largo', tab: 'Largo', minutes: 15, tone: 'info' },
-}
+import SubjectSelect from './SubjectSelect'
+import { usePomodoro } from '../context/contexts'
 
 const pad = (n) => String(n).padStart(2, '0')
 
+// La lógica del reloj está en PomodoroProvider; este componente solo lo muestra y lo controla
 export default function PomodoroTimer() {
-  const [mode, setMode] = useState('focus')
-  const [secondsLeft, setSecondsLeft] = useState(MODES.focus.minutes * 60)
-  const [running, setRunning] = useState(false)
-  const [sessions, setSessions] = useState(0)
-  const endRef = useRef(0)
+  const {
+    mode,
+    modes,
+    modeInfo,
+    secondsLeft,
+    total,
+    running,
+    finished,
+    started,
+    subjectId,
+    setSubjectId,
+    todaySessions,
+    startPause,
+    reset,
+    changeMode,
+  } = usePomodoro()
 
-  const { label, minutes, tone } = MODES[mode]
-  const total = minutes * 60
-  const progress = (secondsLeft / total) * 100
+  const { label, tone } = modeInfo
+  const progress = total ? (secondsLeft / total) * 100 : 0
   const mm = Math.floor(secondsLeft / 60)
   const ss = secondsLeft % 60
-  const finished = secondsLeft === 0
-  const started = secondsLeft < total && !finished
-
-  // Calcula el tiempo restante contra la hora de fin, así no se atrasa si la pestaña queda en segundo plano
-  useEffect(() => {
-    if (!running) return undefined
-    const id = setInterval(() => {
-      const left = Math.max(0, Math.ceil((endRef.current - Date.now()) / 1000))
-      setSecondsLeft(left)
-      if (left === 0) {
-        setRunning(false)
-        if (mode === 'focus') setSessions((n) => n + 1)
-      }
-    }, 250)
-    return () => clearInterval(id)
-  }, [running, mode])
-
-  const handleStartPause = () => {
-    if (running) {
-      setRunning(false)
-      return
-    }
-    const start = finished ? total : secondsLeft
-    setSecondsLeft(start)
-    endRef.current = Date.now() + start * 1000
-    setRunning(true)
-  }
-
-  const handleReset = () => {
-    setRunning(false)
-    setSecondsLeft(total)
-  }
-
-  const handleMode = (key) => {
-    setMode(key)
-    setRunning(false)
-    setSecondsLeft(MODES[key].minutes * 60)
-  }
 
   let status = 'Listo para empezar'
   if (running) status = 'En curso'
-  else if (finished) status = '¡Sesión terminada!'
+  else if (finished) status = mode === 'focus' ? '¡Sesión terminada!' : '¡Descanso terminado!'
   else if (started) status = 'En pausa'
 
   return (
@@ -78,7 +47,7 @@ export default function PomodoroTimer() {
         aria-label="Tipo de sesión"
         className="bg-body-tertiary border rounded-pill p-1"
       >
-        {Object.entries(MODES).map(([key, m]) => {
+        {Object.entries(modes).map(([key, m]) => {
           const checked = mode === key
           return (
             <ToggleButton
@@ -88,7 +57,7 @@ export default function PomodoroTimer() {
               name="pomodoro-mode"
               value={key}
               checked={checked}
-              onChange={() => handleMode(key)}
+              onChange={() => changeMode(key)}
               variant={checked ? 'primary' : 'link'}
               size="sm"
               title={m.label}
@@ -121,21 +90,28 @@ export default function PomodoroTimer() {
         </div>
       </div>
 
+      {mode === 'focus' && (
+        <Form.Group controlId="pomodoro-subject" className="w-100" style={{ maxWidth: 320 }}>
+          <Form.Label className="small fw-semibold mb-1">¿Qué materia vas a estudiar?</Form.Label>
+          <SubjectSelect value={subjectId} onChange={setSubjectId} size="sm" />
+        </Form.Group>
+      )}
+
       {/* Controles: acción principal grande + reinicio circular */}
       <Stack direction="horizontal" gap={3} className="justify-content-center">
         <Button
           variant="primary"
           size="lg"
           className="rounded-pill px-5 fw-bold shadow-sm"
-          onClick={handleStartPause}
+          onClick={startPause}
         >
           <i className={`bi ${running ? 'bi-pause-fill' : 'bi-play-fill'} me-2`}></i>
-          {running ? 'Pausar' : started ? 'Continuar' : 'Iniciar'}
+          {running ? 'Pausar' : started ? 'Continuar' : finished ? 'Repetir' : 'Iniciar'}
         </Button>
         <Button
           variant="outline-secondary"
           className="rounded-circle lh-1 p-3"
-          onClick={handleReset}
+          onClick={reset}
           disabled={!started && !running && !finished}
           aria-label="Reiniciar"
           title="Reiniciar"
@@ -144,8 +120,22 @@ export default function PomodoroTimer() {
         </Button>
       </Stack>
 
+      {finished && mode === 'focus' && (
+        <Stack direction="horizontal" gap={2} className="flex-wrap justify-content-center">
+          <span className="small text-secondary">¿Y ahora?</span>
+          <Button size="sm" variant="outline-success" className="rounded-pill" onClick={() => changeMode(todaySessions.length % 4 === 0 ? 'long' : 'short')}>
+            Tomar un descanso
+          </Button>
+        </Stack>
+      )}
+      {finished && mode !== 'focus' && (
+        <Button size="sm" variant="outline-primary" className="rounded-pill" onClick={() => changeMode('focus')}>
+          Volver a enfocarme
+        </Button>
+      )}
+
       <p className="text-secondary small mb-0">
-        Sesiones de enfoque completadas: <strong>{sessions}</strong>
+        Sesiones de enfoque completadas hoy: <strong>{todaySessions.length}</strong>
       </p>
     </Stack>
   )

@@ -8,25 +8,27 @@ Este repositorio (**Repositorio Nº 2**) es la migración del proyecto original 
 
 ## Funcionalidades
 
-- **Inicio de sesión** con validación de correo y contraseña, mensajes de error claros y botón para mostrar u ocultar la contraseña. Por ahora es una simulación del lado del cliente, sin backend: cualquier dato válido permite ingresar.
+Studify funciona completo en el navegador: no necesita backend. Las cuentas y los datos de estudio se guardan en `localStorage`, separados por usuario.
+
+- **Cuentas:** registro con nombre, correo y contraseña (la contraseña se guarda como hash SHA-256, nunca en texto plano), inicio de sesión que valida el correo y la contraseña, y **modo invitado** con datos de ejemplo. Las páginas internas están protegidas: sin sesión se redirige al login y, al entrar, se vuelve a la página que se quería ver.
 - **Cierre de sesión** con ventana de confirmación.
-- **Tema claro y oscuro**, que se puede cambiar desde la barra superior (escritorio) o la barra móvil. La elección se guarda en el navegador.
-- **Panel de inicio (Dashboard)** con las siguientes secciones:
-  - Resumen de actividad (horas estudiadas, materias, apuntes y exámenes).
-  - Plan de hoy, con tareas que se pueden marcar como completadas.
-  - Mis materias, con barra de progreso y próxima tarea.
-  - Mis apuntes y próximos exámenes.
-  - Mi progreso y técnicas de estudio.
-  - **Pomodoro** con reloj circular: permite elegir entre sesión de enfoque (25 min) y descansos (5 y 15 min), iniciar, pausar, continuar y reiniciar, y cuenta las sesiones de enfoque completadas.
-  - **Estadísticas** con un gráfico de barras de las horas de estudio por día de la semana.
-  - **Asistente de estudio** en formato de chat. Las respuestas son simuladas (no hay una IA real conectada).
-  - **Buscar en Wikipedia**: el estudiante escribe un tema y la aplicación muestra artículos relacionados con su resumen, imagen y enlace. Consume la API pública de Wikipedia (ver más abajo).
-  - **Calendario** mensual con exámenes, entregas y sesiones de estudio. Al elegir un día se muestran sus eventos.
-- **Navegación entre páginas** con React Router: login, panel de inicio y página 404.
-- **Diseño responsive**: barra lateral y barra superior en escritorio; en celulares, una barra con menú desplegable que muestra todas las secciones.
+- **Inicio (Dashboard):** saludo con el nombre del usuario, resumen calculado (horas de la semana, materias, apuntes y exámenes próximos), plan de hoy con alta rápida de tareas, materias con su progreso, apuntes recientes, próximos exámenes y progreso semanal. Si la cuenta está vacía, ofrece crear una materia o cargar datos de ejemplo.
+- **Plan de hoy (tareas):** crear, editar, completar y eliminar tareas con materia, prioridad y fecha límite. Filtros Hoy / Pendientes / Completadas / Todas, búsqueda, filtro por materia y borrado de completadas. Las tareas vencidas se marcan en rojo.
+- **Mis materias:** crear, editar y eliminar materias con ícono y color. El progreso se calcula con las tareas completadas. Al borrar una materia, sus tareas, apuntes y exámenes no se pierden: quedan como "Sin materia".
+- **Mis apuntes:** crear, editar y eliminar apuntes, buscar en títulos y contenido, filtrar por materia y ordenar.
+- **Próximos exámenes:** exámenes y entregas con cuenta regresiva, filtros por tipo y materia, y fechas pasadas.
+- **Calendario** mensual con los eventos guardados: se elige un día para agregar, editar o eliminar eventos, y también se ven las tareas que vencen ese día.
+- **Pomodoro:** enfoque y descansos con duración configurable. Se elige la materia, y cada sesión terminada se guarda y suma a las estadísticas. El reloj sigue corriendo aunque se cambie de página (se ve en la barra superior), y suena y avisa al terminar.
+- **Estadísticas:** tiempo de hoy, de la semana, racha de días y total; objetivo semanal, materias al día y tareas completadas; gráfico semanal con navegación entre semanas y tiempo por materia.
+- **Técnicas de estudio** con los pasos de cada una y acceso directo a la sección donde aplicarla.
+- **Asistente de estudio con IA (Gemini por defecto, gratis):** chat que conoce tus materias, tareas, exámenes, apuntes y progreso, y mantiene el hilo de la conversación. Si la IA no está disponible (sin clave, sin conexión o con demasiada demanda), responde en **modo básico** con respuestas predefinidas sobre tus datos.
+- **Buscar en Wikipedia:** muestra artículos con resumen, imagen y enlace, y permite **guardar un resultado como apunte**.
+- **Configuración:** editar nombre, cambiar contraseña, tema claro/oscuro, objetivo semanal y tiempos del Pomodoro; exportar e importar una copia de los datos (JSON), cargar datos de ejemplo, borrar todos los datos o eliminar la cuenta.
+- **Tema claro y oscuro**, que se guarda en el navegador.
+- **Diseño responsive**: barra lateral y barra superior en escritorio; en celulares, una barra con menú desplegable.
 - **Título propio en cada página** y uso de etiquetas semánticas (`header`, `main`, `section`, `aside`, `nav`).
 
-> Los datos del panel (materias, apuntes, tareas, estadísticas) son datos de ejemplo definidos en `src/pages/Dashboard.jsx`. Los eventos del calendario y los exámenes están en `src/data/events.js` y se calculan a partir de la fecha actual.
+> Como los datos viven en el navegador, cada navegador o dispositivo tiene sus propias cuentas. Para pasar los datos a otro lado, usar **Exportar copia** e **Importar copia** en Configuración.
 
 ## Tecnologías utilizadas
 
@@ -92,14 +94,42 @@ VITE_API_URL=https://es.wikipedia.org/w/api.php
 Y leerla en el código con:
 
 ```js
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || 'https://es.wikipedia.org/w/api.php'
 ```
 
 Importante:
 
 - El archivo `.env` **no se sube a GitHub**: está incluido en el `.gitignore`.
 - Vite solo lee el `.env` al iniciar, por lo que hay que reiniciar `npm run dev` después de crearlo o modificarlo.
-- Si la variable no está definida, el buscador muestra un aviso indicando que falta `VITE_API_URL`.
+- Si la variable no está definida, se usa la API de Wikipedia en español (`https://es.wikipedia.org/w/api.php`).
+
+## Asistente con IA
+
+El chat de **IA Asistente** usa un modelo de IA real. Por defecto es **Google Gemini**, que tiene nivel gratuito. La clave **no puede ir en el frontend**, porque cualquiera la vería desde el navegador. Por eso hay una función serverless en `api/chat.js`:
+
+1. El navegador manda a `/api/chat` la conversación y un resumen de los datos del estudiante (`src/utils/aiContext.js`).
+2. La función agrega las instrucciones del asistente, llama a la IA con la clave guardada en el servidor y devuelve el texto de la respuesta.
+3. Si algo falla (sin clave, sin conexión o límite alcanzado), el chat avisa y responde en modo básico.
+
+**Proveedores disponibles** (se eligen con `AI_PROVIDER`):
+
+| `AI_PROVIDER` | Clave | Modelo por defecto | Costo |
+| --- | --- | --- | --- |
+| `gemini` (por defecto) | `GEMINI_API_KEY` | `gemini-3.8-flash` (`GEMINI_MODEL`) | Nivel gratuito con límites |
+| `groq` | `GROQ_API_KEY` | `openai/gpt-oss-120b` (`GROQ_MODEL`) | Nivel gratuito con límites |
+| `anthropic` | `ANTHROPIC_API_KEY` | `claude-haiku-5-5` (`ANTHROPIC_MODEL`) | Pago por uso |
+
+**Configuración local:**
+
+1. Crear una clave gratis en [Google AI Studio](https://aistudio.google.com/apikey).
+2. En el `.env` (ver `.env.example`), escribir `GEMINI_API_KEY=tu-clave`.
+3. Correr `npm run dev`. Funciona directamente: `vite.config.js` incluye un plugin que ejecuta `api/chat.js` en el servidor de desarrollo.
+
+**En Vercel:** agregar `GEMINI_API_KEY` en **Settings → Environment Variables** y volver a hacer el deploy. Para usar otro proveedor, agregar también `AI_PROVIDER` y su clave.
+
+**Protecciones:** la función acepta solo `POST`, limita la cantidad y el largo de los mensajes, corta las respuestas largas y tiene un límite de 10 preguntas por minuto por IP.
+
+> En el nivel gratuito de Gemini, Google puede usar el contenido de las consultas para mejorar sus productos. No escribas datos personales sensibles en el chat.
 
 ## Consumo de API (Wikipedia)
 
@@ -119,56 +149,80 @@ El contenido de Wikipedia está disponible bajo la licencia [CC BY-SA 4.0](https
 | Ruta | Página |
 | --- | --- |
 | `/login` | Inicio de sesión |
+| `/registro` | Crear cuenta |
 | `/` | Panel de inicio (Dashboard) |
 | `/inicio` | Redirige al panel de inicio (`/`) |
+| `/tareas` | Plan de hoy y todas las tareas (acepta `?materia=<id>`) |
+| `/materias` | Mis materias |
+| `/apuntes` | Mis apuntes (acepta `?materia=<id>`) |
+| `/examenes` | Próximos exámenes y entregas (acepta `?materia=<id>`) |
+| `/calendario` | Calendario |
+| `/pomodoro` | Pomodoro y sesiones de hoy |
+| `/estadisticas` | Mi progreso y estadísticas |
+| `/tecnicas` | Técnicas de estudio |
+| `/asistente` | Asistente de estudio |
+| `/wikipedia` | Buscar en Wikipedia |
+| `/configuracion` | Perfil, preferencias y datos |
 | `*` | Página 404 |
+
+Todas las rutas, salvo `/login` y `/registro`, necesitan una sesión iniciada.
 
 ## Estructura del proyecto
 
 ```
 studify-react/
-├── public/                   # Íconos e imágenes estáticas
+├── public/                    # Íconos e imágenes estáticas
 ├── src/
-│   ├── components/           # Componentes reutilizables
-│   │   ├── AppNavbar.jsx     # Barra móvil con menú desplegable
-│   │   ├── CalendarView.jsx  # Calendario mensual
-│   │   ├── ChatAssistant.jsx # Asistente en formato chat
-│   │   ├── ExamCard.jsx
-│   │   ├── NoteCard.jsx
-│   │   ├── PanelSection.jsx  # Contenedor de cada sección del Dashboard
-│   │   ├── PomodoroTimer.jsx # Reloj Pomodoro circular
-│   │   ├── ProgressBar.jsx
-│   │   ├── SectionHeader.jsx
-│   │   ├── Sidebar.jsx       # Barra lateral (escritorio)
-│   │   ├── StatCard.jsx
-│   │   ├── SubjectCard.jsx
-│   │   ├── TaskItem.jsx
-│   │   ├── TechniqueCard.jsx
-│   │   ├── ToneIcon.jsx
-│   │   ├── TopBar.jsx        # Barra superior (escritorio): tema y cierre de sesión
-│   │   ├── WeeklyChart.jsx   # Gráfico de barras semanal
-│   │   └── WikiSearch.jsx    # Buscador que consume la API de Wikipedia
+│   ├── components/            # Componentes reutilizables
+│   │   ├── AppNavbar.jsx      # Barra móvil con menú desplegable
+│   │   ├── AuthLayout.jsx     # Diseño de login y registro
+│   │   ├── CalendarView.jsx   # Calendario mensual
+│   │   ├── ChatAssistant.jsx  # Asistente en formato chat
+│   │   ├── EmptyState.jsx     # Mensaje para listas vacías
+│   │   ├── EventFormModal.jsx # Formulario de exámenes, entregas y estudio
+│   │   ├── FormModal.jsx      # Ventana base de los formularios
+│   │   ├── NoteFormModal.jsx  # Formulario de apuntes
+│   │   ├── PomodoroBadge.jsx  # Reloj chiquito en la barra superior
+│   │   ├── PomodoroTimer.jsx  # Reloj Pomodoro circular
+│   │   ├── RouteGuards.jsx    # RequireAuth y PublicOnly
+│   │   ├── SubjectFormModal.jsx
+│   │   ├── SubjectSelect.jsx  # Selector de materias
+│   │   ├── TaskFormModal.jsx
+│   │   ├── WikiSearch.jsx     # Buscador que consume la API de Wikipedia
+│   │   └── ...                # Tarjetas, encabezados, barras, etc.
+│   ├── context/
+│   │   ├── contexts.js        # Contextos y hooks useAuth, useData, usePomodoro
+│   │   ├── AuthProvider.jsx   # Cuentas y sesión
+│   │   ├── DataProvider.jsx   # Materias, tareas, apuntes, eventos, sesiones y ajustes
+│   │   └── PomodoroProvider.jsx # Temporizador global
 │   ├── data/
-│   │   ├── events.js         # Eventos del calendario y exámenes
-│   │   └── navItems.js       # Enlaces del menú
+│   │   ├── catalog.js         # Íconos, colores, prioridades y modos del Pomodoro
+│   │   ├── events.js          # Tipos de eventos
+│   │   ├── mascots.js         # Mascota de cada sección
+│   │   ├── navItems.js        # Enlaces del menú
+│   │   └── sampleData.js      # Datos de ejemplo y valores por defecto
 │   ├── hooks/
-│   │   ├── usePageTitle.js   # Título del documento por página
-│   │   └── useTheme.js       # Tema claro/oscuro
+│   │   ├── usePageTitle.js    # Título del documento por página
+│   │   └── useTheme.js        # Tema claro/oscuro
 │   ├── layouts/
-│   │   └── AppLayout.jsx     # Barras de navegación + contenido principal
-│   ├── pages/
-│   │   ├── login.jsx
-│   │   ├── Dashboard.jsx
-│   │   └── NotFound.jsx
+│   │   └── AppLayout.jsx      # Providers de datos + barras de navegación + contenido
+│   ├── pages/                 # Una página por ruta (Dashboard, Tasks, Subjects, Notes, ...)
 │   ├── utils/
-│   │   ├── alerts.js         # Alertas con SweetAlert2
-│   │   └── dates.js          # Funciones de fechas
-│   ├── App.jsx               # Definición de rutas
-│   ├── main.jsx              # Punto de entrada
-│   └── index.css             # Estilos propios (paleta y clases de apoyo)
-├── .env                      # Variables de entorno (local, no se sube a GitHub)
+│   │   ├── aiContext.js       # Resumen de los datos del estudiante para la IA
+│   │   ├── alerts.js          # Alertas, confirmaciones y avisos con SweetAlert2
+│   │   ├── dates.js           # Funciones de fechas
+│   │   ├── id.js              # Generador de ids
+│   │   ├── stats.js           # Cálculos de progreso, horas y próximos eventos
+│   │   ├── storage.js         # Lectura y escritura en localStorage
+│   │   └── validation.js      # Validaciones de formularios
+│   ├── App.jsx                # Definición de rutas
+│   ├── main.jsx               # Punto de entrada
+│   └── index.css              # Estilos propios (paleta y clases de apoyo)
+├── api/
+│   └── chat.js                # Función serverless que llama a la IA (la clave queda en el servidor)
+├── .env.example               # Variables de entorno de ejemplo
 ├── .gitignore
-├── vercel.json               # Redirección para que funcionen las rutas en Vercel
+├── vercel.json                # Redirección para que funcionen las rutas en Vercel
 ├── index.html
 └── package.json
 ```
@@ -184,8 +238,10 @@ studify-react/
   - En `useTheme`, aplica el tema en la página y lo guarda en el navegador cuando cambia.
   - En el chat, baja el scroll cuando llegan mensajes nuevos.
   - En `WikiSearch`, ejecuta la petición a la API al cargar y cuando cambia la búsqueda.
+- **Context API:** `AuthProvider` (sesión), `DataProvider` (datos de estudio guardados en `localStorage`) y `PomodoroProvider` (reloj global) comparten el estado con toda la app mediante los hooks `useAuth`, `useData` y `usePomodoro`.
+- **Formularios controlados con validación:** registro, login, materias, tareas, apuntes, eventos y configuración muestran los errores debajo de cada campo.
 - **Hooks personalizados:** `usePageTitle` actualiza el título de la pestaña en cada página y `useTheme` administra el tema claro u oscuro.
-- **React Router:** rutas, layout compartido con `Outlet`, enlaces con `Link`, redirecciones con `Navigate` y `useNavigate`.
+- **React Router:** rutas, layout compartido con `Outlet`, enlaces con `Link`, redirecciones con `Navigate` y `useNavigate`, rutas protegidas, parámetros de búsqueda con `useSearchParams` y `useOutletContext`.
 - **Axios, SweetAlert2 y variables de entorno:** consumo de una API pública con carga, manejo de errores y avisos al usuario, sin escribir la URL en los componentes.
 
 ## Deploy en Vercel
@@ -193,8 +249,9 @@ studify-react/
 1. Subir el repositorio a GitHub (verificando que `.env` no se suba).
 2. Importar el proyecto en [Vercel](https://vercel.com/) y elegir el repositorio.
 3. Vercel detecta Vite automáticamente (comando de build `npm run build`, carpeta de salida `dist`).
-4. En **Settings → Environment Variables**, agregar `VITE_API_URL` con la URL de la API (`https://es.wikipedia.org/w/api.php`) y volver a hacer el deploy. Sin este paso, el buscador no funciona en producción.
-5. El archivo `vercel.json` redirige todas las rutas a `index.html`, para que al recargar páginas como `/login` no aparezca un error 404.
+4. En **Settings → Environment Variables**, agregar `VITE_API_URL` con la URL de la API (`https://es.wikipedia.org/w/api.php`) y volver a hacer el deploy. Es opcional: si no se define, se usa la Wikipedia en español.
+5. Agregar también `GEMINI_API_KEY` para que funcione el asistente con IA.
+6. El archivo `vercel.json` redirige todas las rutas (menos `/api/...`) a `index.html`, para que al recargar páginas como `/login` no aparezca un error 404.
 
 ## Autores
 

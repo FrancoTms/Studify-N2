@@ -1,21 +1,19 @@
 import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import Offcanvas from 'react-bootstrap/Offcanvas'
 import Stack from 'react-bootstrap/Stack'
-import { Link } from 'react-router-dom'
-import { navItems } from '../data/navItems'
+import PomodoroBadge from './PomodoroBadge'
+import { navItems, isActivePath } from '../data/navItems'
+import { useAuth } from '../context/contexts'
 
-export default function AppNavbar({
-  brand = 'Studify',
-  activeItem = 'Inicio',
-  theme = 'light',
-  onToggleTheme,
-  onLogout,
-}) {
+export default function AppNavbar({ brand = 'Studify', theme = 'light', onToggleTheme, onLogout }) {
   const [open, setOpen] = useState(false)
+  const { pathname } = useLocation()
+  const { user } = useAuth()
   const isDark = theme === 'dark'
 
   return (
@@ -27,10 +25,11 @@ export default function AppNavbar({
     >
       <Container fluid>
         <Navbar.Toggle aria-controls="studify-mobile-nav" aria-label="Abrir menú" />
-        <Navbar.Brand as={Link} to="/inicio" className="fw-bold text-primary">
+        <Navbar.Brand as={Link} to="/" className="fw-bold text-primary">
           {brand}
         </Navbar.Brand>
         <Stack direction="horizontal" gap={2}>
+          <PomodoroBadge compact />
           <Button
             variant="light"
             className="rounded-circle border"
@@ -57,15 +56,17 @@ export default function AppNavbar({
               {brand}
             </Offcanvas.Title>
           </Offcanvas.Header>
-          <Offcanvas.Body>
+          <Offcanvas.Body className="d-flex flex-column">
             <Nav variant="pills" className="flex-column gap-1">
               {navItems.map((item) => {
-                const active = item.label === activeItem
+                const active = isActivePath(pathname, item.to)
                 return (
                   <Nav.Link
-                    key={item.label}
-                    href={item.href}
+                    key={item.to}
+                    as={Link}
+                    to={item.to}
                     active={active}
+                    aria-current={active ? 'page' : undefined}
                     onClick={() => setOpen(false)}
                     className={`d-flex align-items-center gap-2 rounded-3 fw-semibold ${
                       active ? 'bg-primary-subtle text-dark' : 'text-white-50'
@@ -77,6 +78,10 @@ export default function AppNavbar({
                 )
               })}
             </Nav>
+            <p className="small text-white-50 border-top border-white border-opacity-10 pt-3 mt-auto mb-0">
+              <i className="bi bi-person-fill me-1"></i>
+              {user?.name} · {user?.guest ? 'Modo invitado' : user?.email}
+            </p>
           </Offcanvas.Body>
         </Navbar.Offcanvas>
       </Container>

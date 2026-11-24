@@ -1,16 +1,17 @@
+// Ítems del menú lateral y del menú móvil. "to" es la ruta de React Router.
 export const navItems = [
-  { icon: 'bi-house-door-fill', label: 'Inicio', href: '#inicio' },
-  { icon: 'bi-check2-square', label: 'Plan de hoy', href: '#plan-de-hoy' },
-  { icon: 'bi-journal-text', label: 'Mis Apuntes', href: '#mis-apuntes' },
-  { icon: 'bi-calendar2-week', label: 'Próximos Exámenes', href: '#proximos-examenes' },
-  { icon: 'bi-stars', label: 'Modo Foco', href: '#mi-progreso' },
-  { icon: 'bi-signpost-split', label: 'Mi progreso', href: '#mi-progreso' },
-  { icon: 'bi-bar-chart-fill', label: 'Estadísticas', href: '#estadisticas' },
-  { icon: 'bi-alarm-fill', label: 'Pomodoro', href: '#pomodoro' },
-  { icon: 'bi-lightbulb-fill', label: 'Técnicas de Estudio', href: '#tecnicas-estudio' },
-  { icon: 'bi-robot', label: 'IA Asistente', href: '#ia-asistente' },
-  { icon: 'bi-search', label: 'Buscar en Wikipedia', href: '#wikipedia' },
-  { icon: 'bi-calendar3', label: 'Calendario', href: '#calendario' },
-  { icon: 'bi-gear-fill', label: 'Configuración', href: '#configuracion' },
+  { icon: 'bi-house-door-fill', label: 'Inicio', to: '/' },
+  { icon: 'bi-check2-square', label: 'Plan de hoy', to: '/tareas' },
+  { icon: 'bi-book-fill', label: 'Mis Materias', to: '/materias' },
+  { icon: 'bi-journal-text', label: 'Mis Apuntes', to: '/apuntes' },
+  { icon: 'bi-calendar2-week', label: 'Próximos Exámenes', to: '/examenes' },
+  { icon: 'bi-calendar3', label: 'Calendario', to: '/calendario' },
+  { icon: 'bi-alarm-fill', label: 'Pomodoro', to: '/pomodoro' },
+  { icon: 'bi-bar-chart-fill', label: 'Estadísticas', to: '/estadisticas' },
+  { icon: 'bi-lightbulb-fill', label: 'Técnicas de Estudio', to: '/tecnicas' },
+  { icon: 'bi-robot', label: 'IA Asistente', to: '/asistente' },
+  { icon: 'bi-search', label: 'Buscar en Wikipedia', to: '/wikipedia' },
+  { icon: 'bi-gear-fill', label: 'Configuración', to: '/configuracion' },
 ]
- 
+
+export const isActivePath = (pathname, to) => (to === '/' ? pathname === '/' : pathname.startsWith(to))

@@ -4,7 +4,18 @@ import Stack from 'react-bootstrap/Stack'
 import SectionHeader from './SectionHeader'
 import { mascots } from '../data/mascots'
 
-export default function PanelSection({ id, tone = 'primary', title, subtitle, actionLabel, children }) {
+export default function PanelSection({
+  id,
+  tone = 'primary',
+  title,
+  subtitle,
+  actionLabel,
+  actionTo,
+  onAction,
+  actionIcon,
+  headerExtra,
+  children,
+}) {
   const mascot = mascots[id]
 
   return (
@@ -16,7 +27,16 @@ export default function PanelSection({ id, tone = 'primary', title, subtitle, ac
       <div className={`bg-${tone}-subtle px-4 pt-3`}>
         <Stack direction="horizontal" gap={3} className="align-items-end justify-content-between">
           <div className="flex-grow-1 pb-1">
-            <SectionHeader title={title} subtitle={subtitle} actionLabel={actionLabel} />
+            <SectionHeader
+              title={title}
+              subtitle={subtitle}
+              actionLabel={actionLabel}
+              actionTo={actionTo}
+              onAction={onAction}
+              actionIcon={actionIcon}
+            >
+              {headerExtra}
+            </SectionHeader>
           </div>
           {mascot && (
             <Image
