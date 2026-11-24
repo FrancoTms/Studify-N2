@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Tasks from './pages/Tasks'
 import Subjects from './pages/Subjects'
+import SubjectDetail from './pages/SubjectDetail'
 import Notes from './pages/Notes'
 import Exams from './pages/Exams'
 import Calendar from './pages/Calendar'
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="/inicio" element={<Navigate to="/" replace />} />
         <Route path="/tareas" element={<Tasks />} />
         <Route path="/materias" element={<Subjects />} />
+        <Route path="/materias/:subjectId" element={<SubjectDetail />} />
         <Route path="/apuntes" element={<Notes />} />
         <Route path="/examenes" element={<Exams />} />
         <Route path="/calendario" element={<Calendar />} />

@@ -16,7 +16,7 @@ export default function Subjects() {
   usePageTitle('Mis materias | Studify')
   const location = useLocation()
   const navigate = useNavigate()
-  const { subjects, tasks, notes, events, addSubject, updateSubject, deleteSubject } = useData()
+  const { subjects, tasks, notes, events, files, addSubject, updateSubject, deleteSubject } = useData()
   const [editing, setEditing] = useState(null)
 
   // Desde el inicio se puede llegar con la orden de abrir el formulario
@@ -31,6 +31,7 @@ export default function Subjects() {
     tasks: tasks.filter((t) => t.subjectId === id).length,
     notes: notes.filter((n) => n.subjectId === id).length,
     exams: events.filter((e) => e.subjectId === id && e.type === 'exam').length,
+    files: files.filter((f) => f.subjectId === id).length,
   })
 
   const handleSave = (values) => {
@@ -45,12 +46,15 @@ export default function Subjects() {
 
   const handleDelete = async (subject) => {
     setEditing(null)
+    const fileCount = files.filter((f) => f.subjectId === subject.id).length
     const ok = await confirmAction({
       title: `¿Eliminar ${subject.name}?`,
-      text: 'Sus tareas, apuntes y exámenes no se borran: quedan como "Sin materia".',
+      text: `Sus tareas, apuntes y exámenes no se borran: quedan como "Sin materia".${
+        fileCount ? ` Pero sus unidades, temas y ${fileCount} ${fileCount === 1 ? 'archivo' : 'archivos'} sí se eliminan.` : ''
+      }`,
     })
     if (ok) {
-      deleteSubject(subject.id)
+      await deleteSubject(subject.id)
       showToast('Materia eliminada')
     }
   }

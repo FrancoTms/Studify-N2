@@ -16,7 +16,11 @@ export default function SubjectCard({ subject, progress, counts, onEdit, onDelet
         <Stack direction="horizontal" gap={3} className="mb-3 align-items-start">
           <ToneIcon icon={`${icon} fs-5`} tone={tone} />
           <div className="flex-grow-1" style={{ minWidth: 0 }}>
-            <Card.Title as="h3" className="h6 fw-bold mb-0 text-break">{name}</Card.Title>
+            <Card.Title as="h3" className="h6 fw-bold mb-0 text-break">
+              <Link to={`/materias/${id}`} className="text-reset text-decoration-none subject-link">
+                {name}
+              </Link>
+            </Card.Title>
             {teacher && <Card.Text className="text-secondary small mb-0">{teacher}</Card.Text>}
           </div>
           {(onEdit || onDelete) && (
@@ -56,6 +60,9 @@ export default function SubjectCard({ subject, progress, counts, onEdit, onDelet
 
         {counts && (
           <Stack direction="horizontal" gap={2} className="flex-wrap mt-3 pt-3 border-top mt-auto">
+            <Button as={Link} to={`/materias/${id}`} variant="primary" size="sm" className="rounded-pill">
+              <i className="bi bi-folder2-open me-1"></i>{counts.files} archivos
+            </Button>
             <Button as={Link} to={`/tareas?materia=${id}`} variant="outline-primary" size="sm" className="rounded-pill">
               <i className="bi bi-check2-square me-1"></i>{counts.tasks} tareas
             </Button>

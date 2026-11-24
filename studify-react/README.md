@@ -15,6 +15,7 @@ Studify funciona completo en el navegador: no necesita backend. Las cuentas y lo
 - **Inicio (Dashboard):** saludo con el nombre del usuario, resumen calculado (horas de la semana, materias, apuntes y exámenes próximos), plan de hoy con alta rápida de tareas, materias con su progreso, apuntes recientes, próximos exámenes y progreso semanal. Si la cuenta está vacía, ofrece crear una materia o cargar datos de ejemplo.
 - **Plan de hoy (tareas):** crear, editar, completar y eliminar tareas con materia, prioridad y fecha límite. Filtros Hoy / Pendientes / Completadas / Todas, búsqueda, filtro por materia y borrado de completadas. Las tareas vencidas se marcan en rojo.
 - **Mis materias:** crear, editar y eliminar materias con ícono y color. El progreso se calcula con las tareas completadas. Al borrar una materia, sus tareas, apuntes y exámenes no se pierden: quedan como "Sin materia".
+- **Archivos por materia** (`/materias/:id`): cada materia tiene su página para organizar el material en **unidades** y **temas**. Se pueden subir PDF, Word, PowerPoint, Excel, imágenes, audio, video, ZIP y cualquier otro archivo (hasta 50 MB cada uno), eligiéndolos o arrastrándolos, y varios a la vez. Los archivos se pueden ver dentro de la app (PDF, imágenes, texto, audio y video), descargar, renombrar, mover a otra unidad o tema, buscar y eliminar. Las unidades se pueden reordenar y plegar.
 - **Mis apuntes:** crear, editar y eliminar apuntes, buscar en títulos y contenido, filtrar por materia y ordenar.
 - **Próximos exámenes:** exámenes y entregas con cuenta regresiva, filtros por tipo y materia, y fechas pasadas.
 - **Calendario** mensual con los eventos guardados: se elige un día para agregar, editar o eliminar eventos, y también se ven las tareas que vencen ese día.
@@ -103,6 +104,18 @@ Importante:
 - Vite solo lee el `.env` al iniciar, por lo que hay que reiniciar `npm run dev` después de crearlo o modificarlo.
 - Si la variable no está definida, se usa la API de Wikipedia en español (`https://es.wikipedia.org/w/api.php`).
 
+## Archivos de las materias
+
+Los archivos no entran en `localStorage` (admite unos 5 MB de texto), así que se guardan en **IndexedDB**, la base de datos del navegador, que admite archivos binarios grandes:
+
+- `src/utils/fileStore.js` guarda el contenido de cada archivo (Blob) en IndexedDB con su id.
+- Los datos del archivo (nombre, tipo, tamaño, materia, unidad y tema) se guardan junto al resto en `DataProvider`, igual que las unidades y los temas.
+- Al subir el primer archivo se le pide al navegador almacenamiento persistente, para que no lo borre si se queda sin espacio.
+- Al eliminar un tema, una unidad o una materia, se borran también sus archivos.
+- En **Configuración** se ve cuánto espacio ocupan los archivos. La copia exportada (JSON) incluye todo menos los archivos.
+
+> Como el resto de Studify, los archivos quedan en ese navegador: no se sincronizan entre dispositivos y se pierden si se borran los datos del sitio.
+
 ## Asistente con IA
 
 El chat de **IA Asistente** usa un modelo de IA real. Por defecto es **Google Gemini**, que tiene nivel gratuito. La clave **no puede ir en el frontend**, porque cualquiera la vería desde el navegador. Por eso hay una función serverless en `api/chat.js`:
@@ -154,6 +167,7 @@ El contenido de Wikipedia está disponible bajo la licencia [CC BY-SA 4.0](https
 | `/inicio` | Redirige al panel de inicio (`/`) |
 | `/tareas` | Plan de hoy y todas las tareas (acepta `?materia=<id>`) |
 | `/materias` | Mis materias |
+| `/materias/:id` | Página de una materia: unidades, temas y archivos |
 | `/apuntes` | Mis apuntes (acepta `?materia=<id>`) |
 | `/examenes` | Próximos exámenes y entregas (acepta `?materia=<id>`) |
 | `/calendario` | Calendario |
@@ -180,7 +194,12 @@ studify-react/
 │   │   ├── ChatAssistant.jsx  # Asistente en formato chat
 │   │   ├── EmptyState.jsx     # Mensaje para listas vacías
 │   │   ├── EventFormModal.jsx # Formulario de exámenes, entregas y estudio
+│   │   ├── FileItem.jsx       # Fila de un archivo con sus acciones
+│   │   ├── FileUploadModal.jsx # Subida de archivos (selector y arrastrar)
+│   │   ├── FileEditModal.jsx  # Renombrar o mover un archivo
+│   │   ├── FilePreviewModal.jsx # Vista previa de PDF, imágenes, texto, audio y video
 │   │   ├── FormModal.jsx      # Ventana base de los formularios
+│   │   ├── NameFormModal.jsx  # Crear o renombrar unidades y temas
 │   │   ├── NoteFormModal.jsx  # Formulario de apuntes
 │   │   ├── PomodoroBadge.jsx  # Reloj chiquito en la barra superior
 │   │   ├── PomodoroTimer.jsx  # Reloj Pomodoro circular
@@ -188,12 +207,13 @@ studify-react/
 │   │   ├── SubjectFormModal.jsx
 │   │   ├── SubjectSelect.jsx  # Selector de materias
 │   │   ├── TaskFormModal.jsx
+│   │   ├── UnitTopicSelect.jsx # Selector de unidad y tema
 │   │   ├── WikiSearch.jsx     # Buscador que consume la API de Wikipedia
 │   │   └── ...                # Tarjetas, encabezados, barras, etc.
 │   ├── context/
 │   │   ├── contexts.js        # Contextos y hooks useAuth, useData, usePomodoro
 │   │   ├── AuthProvider.jsx   # Cuentas y sesión
-│   │   ├── DataProvider.jsx   # Materias, tareas, apuntes, eventos, sesiones y ajustes
+│   │   ├── DataProvider.jsx   # Materias, unidades, temas, archivos, tareas, apuntes, eventos, sesiones y ajustes
 │   │   └── PomodoroProvider.jsx # Temporizador global
 │   ├── data/
 │   │   ├── catalog.js         # Íconos, colores, prioridades y modos del Pomodoro
@@ -211,6 +231,8 @@ studify-react/
 │   │   ├── aiContext.js       # Resumen de los datos del estudiante para la IA
 │   │   ├── alerts.js          # Alertas, confirmaciones y avisos con SweetAlert2
 │   │   ├── dates.js           # Funciones de fechas
+│   │   ├── fileStore.js       # Contenido de los archivos en IndexedDB
+│   │   ├── files.js           # Tamaños, íconos y tipos de archivo
 │   │   ├── id.js              # Generador de ids
 │   │   ├── stats.js           # Cálculos de progreso, horas y próximos eventos
 │   │   ├── storage.js         # Lectura y escritura en localStorage
@@ -238,6 +260,7 @@ studify-react/
   - En `useTheme`, aplica el tema en la página y lo guarda en el navegador cuando cambia.
   - En el chat, baja el scroll cuando llegan mensajes nuevos.
   - En `WikiSearch`, ejecuta la petición a la API al cargar y cuando cambia la búsqueda.
+- **IndexedDB:** almacenamiento de archivos binarios en el navegador, con transacciones y promesas (`src/utils/fileStore.js`).
 - **Context API:** `AuthProvider` (sesión), `DataProvider` (datos de estudio guardados en `localStorage`) y `PomodoroProvider` (reloj global) comparten el estado con toda la app mediante los hooks `useAuth`, `useData` y `usePomodoro`.
 - **Formularios controlados con validación:** registro, login, materias, tareas, apuntes, eventos y configuración muestran los errores debajo de cada campo.
 - **Hooks personalizados:** `usePageTitle` actualiza el título de la pestaña en cada página y `useTheme` administra el tema claro u oscuro.

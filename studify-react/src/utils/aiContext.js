@@ -21,6 +21,26 @@ export function buildStudyContext(data, userName) {
     lines.push(`- ${s.name}${s.teacher ? ` (${s.teacher})` : ''}: ${p.done}/${p.total} tareas completadas (${p.percent}%)`)
   })
 
+  // Organización del material de cada materia (unidades, temas y nombres de archivos)
+  const { units = [], topics = [], files = [] } = data
+  const material = subjects.filter((s) => units.some((u) => u.subjectId === s.id) || files.some((f) => f.subjectId === s.id))
+  if (material.length) {
+    lines.push('\nMaterial subido por materia:')
+    material.forEach((s) => {
+      lines.push(`- ${s.name}:`)
+      units
+        .filter((u) => u.subjectId === s.id)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        .forEach((u) => {
+          const unitTopics = topics.filter((t) => t.unitId === u.id).map((t) => t.name)
+          const unitFiles = files.filter((f) => f.unitId === u.id).map((f) => f.name).slice(0, 8)
+          lines.push(`  - ${u.name}${unitTopics.length ? ` (temas: ${unitTopics.join(', ')})` : ''}${unitFiles.length ? ` | archivos: ${unitFiles.join(', ')}` : ''}`)
+        })
+      const loose = files.filter((f) => f.subjectId === s.id && !f.unitId).map((f) => f.name).slice(0, 8)
+      if (loose.length) lines.push(`  - Sin unidad | archivos: ${loose.join(', ')}`)
+    })
+  }
+
   const pending = tasks.filter((t) => !t.completed).sort(sortTasks).slice(0, 15)
   lines.push('\nTareas pendientes (fecha límite AAAA-MM-DD):')
   if (!pending.length) lines.push('- (ninguna)')
