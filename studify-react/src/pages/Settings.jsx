@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import Alert from 'react-bootstrap/Alert'
 import Button from 'react-bootstrap/Button'
@@ -13,6 +13,8 @@ import usePageTitle from '../hooks/usePageTitle'
 import { useAuth, useData, usePomodoro } from '../context/contexts'
 import { confirmAction, showError, showToast } from '../utils/alerts'
 import { todayISO } from '../utils/dates'
+import { storageEstimate } from '../utils/fileStore'
+import { formatBytes } from '../utils/files'
 import { cleanErrors, validatePassword } from '../utils/validation'
 
 // Campos numéricos de Configuración con sus límites
@@ -183,7 +185,18 @@ function DataSection() {
   const navigate = useNavigate()
   const data = useData()
   const fileRef = useRef(null)
-  const counts = `${data.subjects.length} materias, ${data.tasks.length} tareas, ${data.notes.length} apuntes, ${data.events.length} eventos y ${data.sessions.length} sesiones`
+  const [storage, setStorage] = useState(null)
+  const filesBytes = data.files.reduce((sum, f) => sum + f.size, 0)
+
+  // Espacio del navegador: se vuelve a consultar cuando cambian los archivos
+  useEffect(() => {
+    let active = true
+    storageEstimate().then((estimate) => active && setStorage(estimate))
+    return () => {
+      active = false
+    }
+  }, [data.files.length])
+  const counts = `${data.subjects.length} materias, ${data.tasks.length} tareas, ${data.notes.length} apuntes, ${data.files.length} archivos, ${data.events.length} eventos y ${data.sessions.length} sesiones`
 
   const handleExport = () => {
     const blob = new Blob([JSON.stringify(data.exportData(), null, 2)], { type: 'application/json' })
@@ -202,9 +215,9 @@ function DataSection() {
     try {
       const parsed = JSON.parse(await file.text())
       if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.subjects)) throw new Error('El archivo no tiene el formato de Studify.')
-      const ok = await confirmAction({ title: '¿Importar el archivo?', text: 'Tus datos actuales se van a reemplazar por los del archivo.', confirmText: 'Importar' })
+      const ok = await confirmAction({ title: '¿Importar el archivo?', text: 'Tus datos actuales se van a reemplazar por los del archivo. Los archivos subidos se conservan si su materia sigue existiendo.', confirmText: 'Importar' })
       if (!ok) return
-      data.importData(parsed)
+      await data.importData(parsed)
       showToast('Datos importados')
     } catch (err) {
       showError(err.message === 'El archivo no tiene el formato de Studify.' ? err.message : 'No pudimos leer el archivo. Revisá que sea una copia exportada desde Studify.', 'No se pudo importar')
@@ -212,9 +225,9 @@ function DataSection() {
   }
 
   const handleSample = async () => {
-    const ok = await confirmAction({ title: '¿Cargar datos de ejemplo?', text: 'Se van a reemplazar tus datos actuales por datos de ejemplo.', confirmText: 'Cargar' })
+    const ok = await confirmAction({ title: '¿Cargar datos de ejemplo?', text: 'Se van a reemplazar tus datos actuales (incluidos los archivos subidos) por datos de ejemplo.', confirmText: 'Cargar' })
     if (ok) {
-      data.loadSampleData()
+      await data.loadSampleData()
       showToast('Datos de ejemplo cargados')
     }
   }
@@ -222,7 +235,7 @@ function DataSection() {
   const handleReset = async () => {
     const ok = await confirmAction({ title: '¿Borrar todos tus datos?', text: `Se van a eliminar ${counts}. No se puede deshacer.`, confirmText: 'Borrar todo' })
     if (ok) {
-      data.resetData()
+      await data.resetData()
       showToast('Datos borrados')
     }
   }
@@ -234,6 +247,7 @@ function DataSection() {
       confirmText: 'Eliminar',
     })
     if (ok) {
+      await data.purgeFiles()
       deleteAccount()
       navigate('/login', { replace: true })
     }
@@ -241,8 +255,14 @@ function DataSection() {
 
   return (
     <>
-      <p className="text-secondary small">
+      <p className="text-secondary small mb-1">
         Tus datos se guardan en este navegador. Tenés {counts}.
+      </p>
+      <p className="text-secondary small">
+        <i className="bi bi-hdd me-1"></i>
+        Archivos subidos: {formatBytes(filesBytes)}
+        {storage?.quota ? ` · Espacio usado en el navegador: ${formatBytes(storage.usage)} de ${formatBytes(storage.quota)} disponibles` : ''}
+        . La copia exportada incluye todo menos los archivos.
       </p>
       <Stack direction="horizontal" gap={2} className="flex-wrap mb-4">
         <Button variant="outline-primary" onClick={handleExport}>

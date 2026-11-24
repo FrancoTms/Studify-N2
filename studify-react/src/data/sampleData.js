@@ -13,6 +13,9 @@ export const emptyData = () => ({
   notes: [],
   events: [],
   sessions: [],
+  units: [],
+  topics: [],
+  files: [],
   settings: { ...DEFAULT_SETTINGS },
 })
 
@@ -80,6 +83,20 @@ export function createSampleData(settings = DEFAULT_SETTINGS) {
       { id: 'sample-e5', title: 'Trabajo Práctico N.º 2', subjectId: PROG, type: 'task', date: day(5), time: '23:59' },
       { id: 'sample-e6', title: 'Evaluación práctica', subjectId: ANAL, type: 'exam', date: day(9), time: '10:00' },
     ],
+    // Unidades y temas de ejemplo (los archivos se suben desde la página de cada materia)
+    units: [
+      { id: 'sample-u1', subjectId: PROG, name: 'Unidad 1: Fundamentos de React', order: 0, createdAt: at(-20, 9) },
+      { id: 'sample-u2', subjectId: PROG, name: 'Unidad 2: Hooks y estado', order: 1, createdAt: at(-20, 9) },
+      { id: 'sample-u3', subjectId: ANAL, name: 'Unidad 1: Requerimientos', order: 0, createdAt: at(-20, 9) },
+      { id: 'sample-u4', subjectId: GEST, name: 'Unidad 1: Estimación', order: 0, createdAt: at(-20, 9) },
+    ],
+    topics: [
+      { id: 'sample-tp1', unitId: 'sample-u1', name: 'Componentes y props', createdAt: at(-20, 9) },
+      { id: 'sample-tp2', unitId: 'sample-u1', name: 'JSX', createdAt: at(-20, 9) },
+      { id: 'sample-tp3', unitId: 'sample-u2', name: 'useState y useEffect', createdAt: at(-20, 9) },
+      { id: 'sample-tp4', unitId: 'sample-u3', name: 'Funcionales y no funcionales', createdAt: at(-20, 9) },
+    ],
+    files: [],
     // Sesiones de Pomodoro de los últimos días para que las estadísticas tengan datos
     sessions: [
       [-6, 9, PROG], [-6, 10, PROG], [-5, 18, ANAL], [-4, 9, GEST], [-4, 10, GEST], [-4, 11, PROG],
