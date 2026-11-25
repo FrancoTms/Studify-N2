@@ -2,11 +2,17 @@
 // Las claves viven solo en el servidor (variables de entorno), nunca en el navegador.
 //
 // Proveedor según AI_PROVIDER:
-//   gemini    (por defecto, nivel gratuito) → GEMINI_API_KEY    · modelo GEMINI_MODEL
-//   groq      (nivel gratuito)              → GROQ_API_KEY      · modelo GROQ_MODEL
-//   anthropic (Claude, pago por uso)        → ANTHROPIC_API_KEY · modelo ANTHROPIC_MODEL
+//   gemini    (por defecto, nivel gratuito) → GEMINI_API_KEY    · modelos GEMINI_MODEL
+//   groq      (nivel gratuito)              → GROQ_API_KEY      · modelos GROQ_MODEL
+//   anthropic (Claude, pago por uso)        → ANTHROPIC_API_KEY · modelos ANTHROPIC_MODEL
+//
+// Las variables de modelo aceptan varios nombres separados por coma, en orden de preferencia.
+// Si un modelo está saturado (503), sin cupo (429) o ya no existe (404), se prueba el siguiente.
+// Si todos fallan, se usa como respaldo cualquier otro proveedor que tenga su clave configurada.
 
 const MAX_OUTPUT_TOKENS = 1024
+const ATTEMPT_TIMEOUT_MS = 9000 // tiempo máximo por intento
+const RETRY_DELAY_MS = 800
 const MAX_MESSAGES = 20
 const MAX_MESSAGE_LENGTH = 2000
 const MAX_CONTEXT_LENGTH = 8000
@@ -64,32 +70,53 @@ function cleanMessages(raw) {
   return result
 }
 
+// retryable = vale la pena probar con otro modelo o proveedor
 class ProviderError extends Error {
-  constructor(status, message) {
+  constructor(status, message, retryable = false) {
     super(message)
     this.status = status
+    this.retryable = retryable
   }
 }
 
 // Traduce los errores HTTP de cualquier proveedor a mensajes para el usuario
-function providerError(status, detail, name) {
-  console.error(`Error de ${name}:`, status, detail)
+function providerError(status, detail, name, model) {
+  console.error(`Error de ${name} (${model}):`, status, detail)
   if (status === 400 && /api key|api_key/i.test(String(detail))) return new ProviderError(500, `La clave de ${name} no es válida.`)
   if (status === 401 || status === 403) return new ProviderError(500, `La clave de ${name} no es válida o no tiene permiso.`)
-  if (status === 404) return new ProviderError(500, `El modelo configurado no existe en ${name}. Revisá la variable del modelo.`)
-  if (status === 429) return new ProviderError(429, 'Se alcanzó el límite gratuito de la IA. Probá de nuevo en un rato.')
-  if (status >= 500) return new ProviderError(503, 'La IA está con mucha demanda en este momento. Probá de nuevo en unos segundos.')
+  if (status === 404) return new ProviderError(500, `El modelo ${model} no existe en ${name}. Revisá la variable del modelo.`, true)
+  if (status === 429) return new ProviderError(429, 'Se alcanzó el límite gratuito de la IA. Probá de nuevo en un rato.', true)
+  if (status >= 500) return new ProviderError(503, 'La IA está con mucha demanda en este momento. Probá de nuevo en unos segundos.', true)
   return new ProviderError(502, 'No pudimos obtener una respuesta del asistente.')
 }
+
+// fetch con tiempo máximo: si el modelo no contesta a tiempo, se pasa al siguiente
+async function fetchWithTimeout(url, options, name, model) {
+  try {
+    return await fetch(url, { ...options, signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS) })
+  } catch (error) {
+    console.error(`Sin respuesta de ${name} (${model}):`, error?.name ?? error)
+    throw new ProviderError(503, 'La IA tardó demasiado en responder. Probá de nuevo.', true)
+  }
+}
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const modelList = (value, fallback) =>
+  (value || fallback)
+    .split(',')
+    .map((m) => m.trim())
+    .filter(Boolean)
 
 const PROVIDERS = {
   gemini: {
     name: 'Gemini',
     keyVar: 'GEMINI_API_KEY',
-    model: () => process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+    // Primero los modelos más livianos y menos saturados del nivel gratuito
+    models: () => modelList(process.env.GEMINI_MODEL, 'gemini-3.6-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-3.8-flash'),
     async ask({ apiKey, model, system, messages }) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`
-      const response = await fetch(url, {
+      const response = await fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'x-goog-api-key': apiKey, 'content-type': 'application/json' },
         body: JSON.stringify({
@@ -98,9 +125,9 @@ const PROVIDERS = {
           contents: messages.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
           generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS, temperature: 0.7 },
         }),
-      })
+      }, 'Gemini', model)
       const data = await response.json().catch(() => null)
-      if (!response.ok) throw providerError(response.status, data?.error?.message, 'Gemini')
+      if (!response.ok) throw providerError(response.status, data?.error?.message, 'Gemini', model)
       const candidate = data?.candidates?.[0]
       if (candidate?.finishReason === 'SAFETY') return 'Prefiero no responder eso. ¿Te ayudo con algo de tu estudio?'
       return (candidate?.content?.parts ?? []).map((p) => p.text ?? '').join('').trim()
@@ -110,9 +137,9 @@ const PROVIDERS = {
   groq: {
     name: 'Groq',
     keyVar: 'GROQ_API_KEY',
-    model: () => process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
+    models: () => modelList(process.env.GROQ_MODEL, 'openai/gpt-oss-120b,llama-3.3-70b-versatile'),
     async ask({ apiKey, model, system, messages }) {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
         body: JSON.stringify({
@@ -120,9 +147,9 @@ const PROVIDERS = {
           max_tokens: MAX_OUTPUT_TOKENS,
           messages: [{ role: 'system', content: system }, ...messages],
         }),
-      })
+      }, 'Groq', model)
       const data = await response.json().catch(() => null)
-      if (!response.ok) throw providerError(response.status, data?.error?.message, 'Groq')
+      if (!response.ok) throw providerError(response.status, data?.error?.message, 'Groq', model)
       return (data?.choices?.[0]?.message?.content ?? '').trim()
     },
   },
@@ -130,15 +157,15 @@ const PROVIDERS = {
   anthropic: {
     name: 'Claude',
     keyVar: 'ANTHROPIC_API_KEY',
-    model: () => process.env.ANTHROPIC_MODEL || 'claude-haiku-5-5',
+    models: () => modelList(process.env.ANTHROPIC_MODEL, 'claude-haiku-5-5'),
     async ask({ apiKey, model, system, messages }) {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
         body: JSON.stringify({ model, max_tokens: MAX_OUTPUT_TOKENS, system, messages }),
-      })
+      }, 'Claude', model)
       const data = await response.json().catch(() => null)
-      if (!response.ok) throw providerError(response.status, data?.error?.message, 'Claude')
+      if (!response.ok) throw providerError(response.status, data?.error?.message, 'Claude', model)
       return (data?.content ?? [])
         .filter((block) => block.type === 'text')
         .map((block) => block.text)
@@ -146,6 +173,31 @@ const PROVIDERS = {
         .trim()
     },
   },
+}
+
+// Prueba cada modelo de cada proveedor en orden hasta obtener una respuesta.
+// El primer modelo saturado se reintenta una vez tras una pausa corta.
+async function askWithFallback(chain, request) {
+  let lastError = null
+  for (const { provider, apiKey } of chain) {
+    for (const [index, model] of provider.models().entries()) {
+      const attempts = index === 0 ? 2 : 1
+      for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        try {
+          const reply = await provider.ask({ apiKey, model, ...request })
+          if (lastError) console.info(`Respondió ${provider.name} (${model}) después de errores anteriores.`)
+          return reply
+        } catch (error) {
+          if (!(error instanceof ProviderError) || !error.retryable) throw error
+          lastError = error
+          // Solo vale la pena reintentar el mismo modelo si estaba saturado
+          if (attempt < attempts && error.status === 503) await wait(RETRY_DELAY_MS)
+          else break
+        }
+      }
+    }
+  }
+  throw lastError ?? new ProviderError(502, 'No pudimos obtener una respuesta del asistente.')
 }
 
 export default async function handler(req, res) {
@@ -157,6 +209,14 @@ export default async function handler(req, res) {
 
   const apiKey = process.env[provider.keyVar]
   if (!apiKey) return send(res, 500, { error: `El servidor no tiene configurada la clave ${provider.keyVar}.` })
+
+  // Proveedor elegido primero; después, de respaldo, los demás que tengan clave
+  const chain = [
+    { provider, apiKey },
+    ...Object.entries(PROVIDERS)
+      .filter(([key, p]) => key !== providerKey && process.env[p.keyVar])
+      .map(([, p]) => ({ provider: p, apiKey: process.env[p.keyVar] })),
+  ]
 
   const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? 'local').split(',')[0].trim()
   if (rateLimited(ip)) return send(res, 429, { error: 'Muchas preguntas seguidas. Esperá un minuto y probá de nuevo.' })
@@ -181,7 +241,7 @@ export default async function handler(req, res) {
     : SYSTEM_PROMPT
 
   try {
-    const reply = await provider.ask({ apiKey, model: provider.model(), system, messages })
+    const reply = await askWithFallback(chain, { system, messages })
     return send(res, 200, { reply: reply || 'No tengo una respuesta para eso. ¿Podés reformular la pregunta?' })
   } catch (error) {
     if (error instanceof ProviderError) return send(res, error.status, { error: error.message })
